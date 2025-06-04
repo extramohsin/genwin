@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import API_URL from "../config";
 
 const MatchResults = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const MatchResults = () => {
 
         const { userId } = JSON.parse(storedUser);
         const response = await fetch(
-          `http://localhost:5000/api/match/results/${userId}`
+          `${API_URL}/api/match/results/${userId}`
         );
         const data = await response.json();
 
