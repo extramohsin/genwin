@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import API_URL from "../config";
 
 const AutoComplete = ({ value, onChange, placeholder, excludeValues = [] }) => {
   const [suggestions, setSuggestions] = useState([]);
@@ -18,7 +19,7 @@ const AutoComplete = ({ value, onChange, placeholder, excludeValues = [] }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/match/suggestions?query=${encodeURIComponent(
+        `${API_URL}/api/match/suggestions?query=${encodeURIComponent(
           query
         )}`
       );
