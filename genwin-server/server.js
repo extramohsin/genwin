@@ -52,22 +52,32 @@ const connectDB = async () => {
 const startServer = async () => {
   await connectDB();
   // Add this near your other imports
-  const path = require('path');
-  
+  const path = require("path");
+
   // Add cors configuration
-  app.use(cors({
-    origin: ['http://localhost:5173', 'https://your-frontend-url.onrender.com'],
-    credentials: true
-  }));
-  
+  app.use(
+    cors({
+      origin: [
+        "http://localhost:5173",
+        "https://your-frontend-url.onrender.com",
+      ],
+      credentials: true,
+    })
+  );
+
   // Add this before your routes
-  if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../genwin-client/dist')));
+  if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, "../genwin-client/dist")));
   }
-  
+
   // Update your port configuration
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => console.log(`🚀 Server is running on port ${PORT}`));
 };
 
 startServer();
+app.use(cors({
+  origin: "https://genwin-frontend.onrender.com",
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+}));
