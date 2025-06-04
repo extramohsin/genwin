@@ -1,314 +1,503 @@
-@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Pacifico&display=swap");
+/* Clean & Fun CSS for GenWin - Perfect for College/Teenage Audience */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fredoka:wght@400;500;600;700&display=swap");
 
 :root {
-  --pink-gradient: linear-gradient(
-    45deg,
-    #ff3cac 0%,
-    #ff9a5f 50%,
-    #ffc83d 100%
-  );
-  --soft-background: linear-gradient(120deg, #fccb90 0%, #d57eeb 100%);
-  --primary-pink: #ff3cac;
-  --secondary-purple: #784ba0;
-  --dark-gray: #333333;
-  --light-gray: #f9f9f9;
-  --soft-white: rgba(255, 255, 255, 0.95);
+  /* Simple & Clean Color System */
+  --gradient-primary: linear-gradient(135deg, #f767b6 0%, #f0c0f0 100%);
+  --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-accent: linear-gradient(120deg, #a8edea 0%, #fcc2d4 100%);
+
+  /* Solid Colors */
+  --color-primary: #667eea;
+  --color-secondary: #764ba2;
+  --color-accent: #f5576c;
+  --color-dark: #2d3436;
+  --color-light: #f5da91;
+  --color-white: #ffffff;
+
+  /* Clean Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.2);
+
+  /* Smooth Transitions */
+  --transition-fast: 0.2s;
+  --transition-normal: 0.3s;
+  --transition-slow: 0.5s;
+
+  /* Spacing System */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-xxl: 3rem;
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
 }
 
-* {
+/* Reset & Base Styles */
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: "Fredoka", sans-serif;
-  color: var(--dark-gray);
-  background-color: #f9f8fd;
-  background-image: radial-gradient(#ff9a8b 2px, transparent 2px),
-    radial-gradient(#fad0c4 2px, transparent 2px);
-  background-size: 40px 40px;
-  background-position: 0 0, 20px 20px;
+  font-family: "Poppins", sans-serif;
+  color: var(--color-dark);
+  background: linear-gradient(135deg, #fdf2f8 0%, #f7e7b1 50%, #dbeafe 100%);
+  line-height: 1.6;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   position: relative;
+  overflow-x: hidden;
 }
 
-/* 💖 Valentine's Header */
+/* Simple Animated Background - Just Floating Dots */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(
+      circle at 20% 30%,
+      rgba(102, 126, 234, 0.1) 0%,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 80% 70%,
+      rgba(118, 75, 162, 0.1) 0%,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 40% 80%,
+      rgba(245, 87, 108, 0.1) 0%,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 90% 10%,
+      rgba(168, 237, 234, 0.1) 0%,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 10% 90%,
+      rgba(254, 214, 227, 0.1) 0%,
+      transparent 2px
+    );
+  background-size: 60px 60px, 80px 80px, 70px 70px, 90px 90px, 50px 50px;
+  background-position: 0 0, 30px 40px, 60px 20px, 10px 60px, 80px 10px;
+  z-index: -1;
+  pointer-events: none;
+  animation: floatingDots 25s linear infinite;
+}
+
+/* Simple Floating Dots Animation */
+@keyframes floatingDots {
+  0% {
+    transform: translateX(0) translateY(0);
+  }
+  25% {
+    transform: translateX(20px) translateY(-10px);
+  }
+  50% {
+    transform: translateX(-10px) translateY(-20px);
+  }
+  75% {
+    transform: translateX(15px) translateY(-5px);
+  }
+  100% {
+    transform: translateX(0) translateY(0);
+  }
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: var(--space-md);
+  color: var(--color-dark);
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-family: "Fredoka", sans-serif;
+}
+
+h2 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-family: "Fredoka", sans-serif;
+}
+
+h3 {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+}
+
+p {
+  margin-bottom: var(--space-md);
+  color: #666;
+}
+
+/* Clean Header */
 header {
   text-align: center;
-  padding: 1.5rem 1rem 2.5rem;
-  background: var(--pink-gradient);
-  color: white;
-  font-size: 2.5rem;
-  font-weight: bold;
-  text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.15);
-  border-bottom-left-radius: 30% 30px;
-  border-bottom-right-radius: 30% 30px;
+  padding: var(--space-xl) var(--space-md) var(--space-xxl);
+  background: var(--gradient-primary);
+  color: var(--color-white);
   position: relative;
-  box-shadow: 0 5px 15px rgba(255, 60, 172, 0.3);
   z-index: 10;
+  clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
+  box-shadow: var(--shadow-lg);
 }
 
 header h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 15px;
-  font-family: "Pacifico", cursive;
-  transform: rotate(-2deg);
+  gap: var(--space-md);
+  font-family: "Fredoka", cursive;
+  color: white;
+  margin-bottom: var(--space-sm);
 }
 
 header h1::after {
-  content: "💖";
+  content: "🎯";
   font-size: 2rem;
-  animation: bounce 0.8s ease infinite alternate;
 }
 
-@keyframes bounce {
-  0% {
-    transform: translateY(0) rotate(0deg);
-  }
-  100% {
-    transform: translateY(-10px) rotate(10deg);
-  }
+header p {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 600px;
+  margin: 0 auto;
 }
 
-/* 🎭 Frosted Glass Cards */
+/* Modern Glass Card */
 .card {
-  background: var(--soft-white);
-  padding: 2rem;
-  border-radius: 24px;
-  box-shadow: rgba(255, 60, 172, 0.4) 5px 5px, rgba(255, 154, 95, 0.3) 10px 10px,
-    rgba(255, 200, 61, 0.2) 15px 15px;
-  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-  border: 3px solid #ff9a5f;
-  margin: 2rem;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: var(--space-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin: var(--space-xl);
   position: relative;
   z-index: 1;
+  transition: transform var(--transition-normal) ease,
+    box-shadow var(--transition-normal) ease;
 }
 
 .card:hover {
-  transform: translateY(-5px) translateX(-5px);
-  box-shadow: rgba(255, 60, 172, 0.4) 10px 10px,
-    rgba(255, 154, 95, 0.3) 15px 15px, rgba(255, 200, 61, 0.2) 20px 20px;
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-xl);
 }
 
-/* 💕 Romantic Buttons */
+/* Awesome Buttons (Keeping the good style you liked) */
 button {
   display: inline-block;
-  background: var(--primary-pink);
-  color: white;
-  font-size: 1.2rem;
+  background: var(--gradient-primary);
+  background-size: 200% auto;
+  color: var(--color-white);
+  font-size: 1rem;
   font-weight: 600;
-  padding: 12px 24px;
-  border-radius: 50px;
+  padding: 0.8rem 1.8rem;
+  border-radius: var(--radius-full);
   border: none;
-  transition: all 0.3s ease;
-  box-shadow: 0 6px 0 #d03090;
   cursor: pointer;
   position: relative;
-  top: 0;
+  overflow: hidden;
+  transition: all var(--transition-normal) ease;
+  box-shadow: var(--shadow-md);
   letter-spacing: 1px;
   text-transform: uppercase;
+  z-index: 1;
+  font-family: "Poppins", sans-serif;
+}
+
+button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transform: translateX(-100%);
+  transition: var(--transition-normal);
+  z-index: -1;
 }
 
 button:hover {
   transform: translateY(-3px);
-  box-shadow: 0 9px 0 #d03090;
+  box-shadow: var(--shadow-lg);
+  background-position: right center;
+}
+
+button:hover::before {
+  transform: translateX(100%);
 }
 
 button:active {
-  transform: translateY(3px);
-  box-shadow: 0 3px 0 #d03090;
+  transform: translateY(1px);
+  box-shadow: var(--shadow-sm);
 }
 
-/* 🌸 Text Input Fields */
+/* Clean Form Elements */
 input,
-textarea {
+textarea,
+select {
   width: 100%;
-  padding: 16px 20px;
-  border: 3px solid #ff9a5f;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.9);
-  font-size: 1.1rem;
-  transition: all 0.3s ease;
-  font-family: "Fredoka", sans-serif;
-  margin-bottom: 1rem;
+  padding: 1rem 1.2rem;
+  border: 2px solid #e1e8ed;
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  font-size: 1rem;
+  transition: all var(--transition-normal) ease;
+  font-family: "Poppins", sans-serif;
+  margin-bottom: var(--space-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: #ff9a5f;
-  opacity: 0.7;
+  color: #9ca3af;
 }
 
 input:focus,
-textarea:focus {
+textarea:focus,
+select:focus {
   outline: none;
-  border-color: var(--primary-pink);
-  box-shadow: 0 0 0 4px rgba(255, 60, 172, 0.3);
-  transform: scale(1.02);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  transform: translateY(-2px);
 }
 
-/* 💖 Valentine's Navigation Links */
-.nav-link {
+/* Navigation Links */
+.nav-button {
   padding: 0.8rem 1.5rem;
-  border-radius: 50px;
-  background: var(--primary-pink);
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-  transition: all 0.3s ease;
+  border-radius: var(--radius-full);
+  background: var(--gradient-primary);
+  background-size: 200% auto;
+  color: var(--color-white);
+  font-weight: 600;
   text-transform: uppercase;
-  box-shadow: 0 5px 0 #d03090;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-normal) ease;
   position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.nav-button::before {
+  content: "";
+  position: absolute;
   top: 0;
-  display: inline-block;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transform: translateX(-100%);
+  transition: transform var(--transition-normal);
+  z-index: -1;
 }
 
-.nav-link:hover {
-  animation: wobble 0.5s ease;
-  background: #ff9a5f;
-  box-shadow: 0 5px 0 #e06a34;
+.nav-button:hover {
+  background-position: right center;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
 
-@keyframes wobble {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  20% {
-    transform: translateX(-8px) rotate(-3deg);
-  }
-  40% {
-    transform: translateX(8px) rotate(3deg);
-  }
-  60% {
-    transform: translateX(-8px) rotate(-3deg);
-  }
-  80% {
-    transform: translateX(5px) rotate(2deg);
-  }
+.nav-button:hover::before {
+  transform: translateX(100%);
 }
 
-/* 📱 Mobile Responsive */
+/* Responsive Design */
 @media (max-width: 768px) {
   header {
-    font-size: 2rem;
-    padding: 1.5rem 1rem 2rem;
+    clip-path: polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%);
+    padding: var(--space-lg) var(--space-md) var(--space-xl);
   }
 
   button {
-    font-size: 1.1rem;
     width: 100%;
+    padding: 0.8rem 1.2rem;
   }
 
   .card {
-    padding: 1.5rem;
-    margin: 1rem;
+    padding: var(--space-lg);
+    margin: var(--space-md);
   }
 
-  .nav-link {
-    padding: 0.7rem 1.2rem;
+  .nav-button {
     display: block;
     text-align: center;
-    margin-bottom: 0.8rem;
+    margin-bottom: var(--space-md);
   }
 }
 
-/* ✨ Additional Fun Elements */
-.confetti-button {
-  position: relative;
-  overflow: hidden;
-}
+/* Simple Effects */
 
-.confetti-button::before {
-  content: "🎉";
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  opacity: 0;
-  transform: translateX(-50%);
-  transition: all 0.5s ease;
-}
-
-.confetti-button:hover::before {
-  animation: confettiDrop 0.5s forwards;
-}
-
-@keyframes confettiDrop {
-  0% {
-    top: -20px;
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    top: 120%;
-    opacity: 0;
-  }
-}
-
-/* Add some fun elements */
+/* Text Selection */
 ::selection {
-  background: var(--primary-pink);
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-white);
 }
 
+/* Text Highlight */
 .highlight {
-  background: linear-gradient(120deg, #ffc83d 0%, #ffc83d 100%);
+  background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
   background-repeat: no-repeat;
   background-size: 100% 40%;
   background-position: 0 90%;
   transition: background-size 0.25s ease-in;
+  padding: 0 0.2rem;
 }
 
 .highlight:hover {
   background-size: 100% 100%;
 }
 
-/* Fun pulsing animation */
-.pulse-element {
-  animation: colorPulse 3s infinite alternate;
+/* Gradient Text */
+.gradient-text {
+  background: var(--gradient-primary);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-@keyframes colorPulse {
-  0% {
-    color: var(--primary-pink);
-  }
-  50% {
-    color: #ffc83d;
-  }
-  100% {
-    color: #ff9a5f;
-  }
+/* Utility Classes */
+.text-center {
+  text-align: center;
+}
+.text-left {
+  text-align: left;
+}
+.text-right {
+  text-align: right;
 }
 
-/* Add a fun border animation */
-.fun-border {
-  position: relative;
+.mt-1 {
+  margin-top: var(--space-sm);
+}
+.mt-2 {
+  margin-top: var(--space-md);
+}
+.mt-3 {
+  margin-top: var(--space-lg);
+}
+.mt-4 {
+  margin-top: var(--space-xl);
 }
 
-.fun-border::after {
-  content: "";
-  position: absolute;
-  bottom: -3px;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background: var(--pink-gradient);
-  background-size: 200% 100%;
-  animation: gradientMove 3s linear infinite;
+.mb-1 {
+  margin-bottom: var(--space-sm);
+}
+.mb-2 {
+  margin-bottom: var(--space-md);
+}
+.mb-3 {
+  margin-bottom: var(--space-lg);
+}
+.mb-4 {
+  margin-bottom: var(--space-xl);
 }
 
-@keyframes gradientMove {
-  0% {
-    background-position: 0% 0%;
-  }
-  100% {
-    background-position: 200% 0%;
-  }
+.p-1 {
+  padding: var(--space-sm);
+}
+.p-2 {
+  padding: var(--space-md);
+}
+.p-3 {
+  padding: var(--space-lg);
+}
+.p-4 {
+  padding: var(--space-xl);
+}
+
+.flex {
+  display: flex;
+}
+.flex-col {
+  flex-direction: column;
+}
+.items-center {
+  align-items: center;
+}
+.justify-center {
+  justify-content: center;
+}
+.justify-between {
+  justify-content: space-between;
+}
+.gap-1 {
+  gap: var(--space-sm);
+}
+.gap-2 {
+  gap: var(--space-md);
+}
+.gap-3 {
+  gap: var(--space-lg);
+}
+
+/* Glass effect for special elements */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Fun but subtle hover effects */
+.hover-lift:hover {
+  transform: translateY(-2px);
+  transition: transform var(--transition-fast) ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+  transition: transform var(--transition-fast) ease;
+}
+
+/* Clean focus states */
+.focus-ring:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
 }

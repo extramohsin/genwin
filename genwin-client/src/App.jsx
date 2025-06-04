@@ -6,6 +6,8 @@ import Register from "./pages/Register";
 import WaitingRoom from "./pages/WaitingRoom";
 import MatchResults from "./pages/MatchResults";
 import Navbar from "./components/Navbar";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const App = () => {
   return (
@@ -41,6 +43,8 @@ const App = () => {
             </>
           }
         />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
       </Routes>
     </Router>
   );

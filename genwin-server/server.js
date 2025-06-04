@@ -6,7 +6,7 @@ const rateLimit = require("express-rate-limit");
 
 const authRoutes = require("./routes/authRoutes");
 const matchRoutes = require("./routes/matchRoutes");
-const userRoutes = require("./routes/userRoutes"); // Add this line
+const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 
@@ -24,7 +24,7 @@ app.use("/api/", limiter);
 // ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/match", matchRoutes);
-app.use("/api/users", userRoutes); // Add this line
+app.use("/api/admin", adminRoutes); // Add this line
 
 // ✅ Default Route
 app.get("/", (req, res) => {
@@ -51,6 +51,21 @@ const connectDB = async () => {
 // ✅ Start Server after DB Connection
 const startServer = async () => {
   await connectDB();
+  // Add this near your other imports
+  const path = require('path');
+  
+  // Add cors configuration
+  app.use(cors({
+    origin: ['http://localhost:5173', 'https://your-frontend-url.onrender.com'],
+    credentials: true
+  }));
+  
+  // Add this before your routes
+  if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '../genwin-client/dist')));
+  }
+  
+  // Update your port configuration
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => console.log(`🚀 Server is running on port ${PORT}`));
 };

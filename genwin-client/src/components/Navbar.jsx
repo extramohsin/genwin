@@ -1,55 +1,63 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <header className="w-full">
-      {/* 🔥 Stylish Header */}
-      <div className="bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 py-6 text-center shadow-md">
-        <h1 className="text-4xl font-extrabold text-white tracking-widest drop-shadow-lg">
-          💖 Genwin - Find Your Match 💖
-        </h1>
-      </div>
-
-      {/* 💡 Navigation Bar */}
-      <nav className="bg-white/80 backdrop-blur-lg shadow-lg p-4 rounded-b-2xl">
-        <div className="container mx-auto flex justify-between items-center">
-          {/* 🔥 Brand Name */}
-          <Link to="/" className="flex items-center gap-2">
-            <span className="text-3xl font-extrabold text-indigo-600 tracking-widest">
+    <header
+      className={`fixed w-full z-50 transition-all duration-300 ${
+        scrolled ? "py-2" : "py-4"
+      }`}
+    >
+      <nav
+        className={`mx-auto px-4 sm:px-6 lg:px-8 ${
+          scrolled ? "bg-white/90 backdrop-blur-lg shadow-lg" : "bg-transparent"
+        } ${location.pathname === "/" ? "text-white" : "text-gray-900"}`}
+      >
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <Link to="/" className="flex items-center space-x-2">
+            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#FF3CAC] to-[#FFC83D]">
               Genwin
             </span>
-            <span className="text-pink-500 text-xl animate-pulse">💞</span>
+            <span className="text-2xl animate-bounce">💝</span>
           </Link>
 
-          {/* 💻 Desktop Navigation */}
-          <div className="hidden md:flex gap-4">
-            <NavButton to="/Home" label="Home" />
-            <NavButton to="/waiting-room" label="Waiting Room" />
-            <NavButton to="/results" label="Results" />
-            <NavButton to="/login" label="Login" />
-            <NavButton to="/register" label="Register" />
+          <div className="hidden md:flex items-center space-x-4">
+            <NavLink to="/home" label="Find Match" icon="💘" />
+            <NavLink to="/waiting-room" label="Waiting Room" icon="⌛" />
+            <NavLink to="/results" label="Results" icon="💖" />
+            <div className="h-6 w-px bg-gray-300 mx-2"></div>
+            <NavLink to="/login" label="Login" icon="🔑" />
+            <NavLink to="/register" label="Register" icon="✨" />
           </div>
 
-          {/* 📱 Mobile Menu Button */}
           <button
-            className="md:hidden text-indigo-600 text-3xl focus:outline-none"
+            className="md:hidden text-gray-600 hover:text-gray-900 focus:outline-none"
             onClick={() => setMenuOpen(!menuOpen)}
           >
-            {menuOpen ? "✔" : "🤷‍♀️"}
+            <span className="text-2xl">{menuOpen ? "✕" : "☰"}</span>
           </button>
         </div>
 
-        {/* 📱 Mobile Menu */}
         {menuOpen && (
-          <div className="md:hidden flex flex-col items-center gap-3 mt-4 p-4 bg-white/90 backdrop-blur-md shadow-md rounded-lg">
-            <NavButton to="/Home" label="Home" />
-            <NavButton to="/waiting-room" label="Waiting Room" />
-            <NavButton to="/results" label="Results" />
-            <NavButton to="/login" label="Login" />
-            <NavButton to="/register" label="Register" />
+          <div className="md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-lg shadow-lg p-4 space-y-3">
+            <MobileNavLink to="/home" label="Find Match" icon="💘" />
+            <MobileNavLink to="/waiting-room" label="Waiting Room" icon="⌛" />
+            <MobileNavLink to="/results" label="Results" icon="💖" />
+            <div className="h-px bg-gray-200 my-2"></div>
+            <MobileNavLink to="/login" label="Login" icon="🔑" />
+            <MobileNavLink to="/register" label="Register" icon="✨" />
           </div>
         )}
       </nav>
@@ -57,15 +65,38 @@ const Navbar = () => {
   );
 };
 
-// 🔘 Stylish Button Component
-const NavButton = ({ to, label }) => (
-  <Link
-    to={to}
-    className="px-5 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-medium rounded-lg 
-              hover:scale-105 hover:shadow-lg transition-all duration-300"
-  >
-    {label}
-  </Link>
-);
+const NavLink = ({ to, label, icon }) => {
+  const location = useLocation();
+  const isActive = location.pathname === to;
+
+  return (
+    <Link
+      to={to}
+      className={`nav-button ${
+        isActive ? "ring-2 ring-white ring-offset-2 ring-offset-pink-400" : ""
+      }`}
+    >
+      <span>{icon}</span>
+      <span>{label}</span>
+    </Link>
+  );
+};
+
+const MobileNavLink = ({ to, label, icon }) => {
+  const location = useLocation();
+  const isActive = location.pathname === to;
+
+  return (
+    <Link
+      to={to}
+      className={`nav-button w-full justify-start ${
+        isActive ? "ring-2 ring-white ring-offset-2 ring-offset-pink-400" : ""
+      }`}
+    >
+      <span>{icon}</span>
+      <span>{label}</span>
+    </Link>
+  );
+};
 
 export default Navbar;

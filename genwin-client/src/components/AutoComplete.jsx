@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from "react";
 
 const AutoComplete = ({ value, onChange, placeholder, excludeValues = [] }) => {
   const [suggestions, setSuggestions] = useState([]);
@@ -17,13 +17,19 @@ const AutoComplete = ({ value, onChange, placeholder, excludeValues = [] }) => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/match/suggestions?query=${encodeURIComponent(query)}`);
+      const response = await fetch(
+        `http://localhost:5000/api/match/suggestions?query=${encodeURIComponent(
+          query
+        )}`
+      );
       const data = await response.json();
       // Filter out already selected names
-      const filteredSuggestions = data.filter(user => !excludeValues.includes(user.fullName));
+      const filteredSuggestions = data.filter(
+        (user) => !excludeValues.includes(user.fullName)
+      );
       setSuggestions(filteredSuggestions);
     } catch (error) {
-      console.error('Error fetching suggestions:', error);
+      console.error("Error fetching suggestions:", error);
       setSuggestions([]);
     }
   };
@@ -62,7 +68,9 @@ const AutoComplete = ({ value, onChange, placeholder, excludeValues = [] }) => {
               className="px-4 py-2 hover:bg-pink-50 cursor-pointer flex justify-between items-center"
             >
               <span>{suggestion.fullName}</span>
-              <span className="text-sm text-gray-500">{suggestion.branch} - {suggestion.year} Year</span>
+              <span className="text-sm text-gray-500">
+                {suggestion.branch} - {suggestion.year} Year
+              </span>
             </li>
           ))}
         </ul>

@@ -98,7 +98,9 @@ const Home = () => {
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Match Preferences</h2>
+          <h2 className="text-3xl font-bold text-gray-900">
+            Match Preferences
+          </h2>
           <p className="mt-2 text-gray-600">
             Choose your match preferences carefully
           </p>
@@ -150,9 +152,19 @@ const Home = () => {
           <button
             type="submit"
             disabled={isSubmitted || loading}
-            className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${isSubmitted ? 'bg-gray-400' : loading ? 'bg-pink-300' : 'bg-pink-600 hover:bg-pink-700'}`}
+            className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
+              isSubmitted
+                ? "bg-gray-400"
+                : loading
+                ? "bg-pink-300"
+                : "bg-pink-600 hover:bg-pink-700"
+            }`}
           >
-            {loading ? 'Submitting...' : isSubmitted ? 'Already Submitted' : 'Submit Matches'}
+            {loading
+              ? "Submitting..."
+              : isSubmitted
+              ? "Already Submitted"
+              : "Submit Matches"}
           </button>
         </form>
       </div>

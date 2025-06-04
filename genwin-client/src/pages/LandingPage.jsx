@@ -135,7 +135,6 @@ const LandingPage = () => {
     };
   }, []);
 
-  // CSS Styles as objects
   const styles = {
     container: {
       minHeight: "100vh",
