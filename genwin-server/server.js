@@ -59,7 +59,7 @@ const startServer = async () => {
     cors({
       origin: [
         "http://localhost:5173",
-        "https://your-frontend-url.onrender.com",
+        "https://genwin-frontend.onrender.com",
       ],
       credentials: true,
     })
