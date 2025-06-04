@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AutoComplete from "../components/AutoComplete";
+import API_URL from "../config";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -30,7 +31,8 @@ const Home = () => {
       setUser(parsedUser);
 
       // Check if user has already submitted
-      fetch(`http://localhost:5000/api/match/results/${parsedUser.userId}`)
+      
+      fetch(`${API_URL}/api/match/results/${parsedUser.userId}`)
         .then((res) => res.json())
         .then((data) => {
           if (data.userSelections) {
@@ -68,7 +70,7 @@ const Home = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/match/submit", {
+      const response = await fetch(`${API_URL}/api/match/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
