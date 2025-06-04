@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
+import API_URL from "../config";
 
 const AuthContext = createContext();
 
@@ -8,8 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  axios.defaults.baseURL =
-    import.meta.env.VITE_APP_API_URL || "http://localhost:5000/api";
+  axios.defaults.baseURL = API_URL + "/api";
 
   useEffect(() => {
     const validateToken = async () => {
