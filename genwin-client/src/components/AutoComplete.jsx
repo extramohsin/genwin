@@ -1,83 +1,87 @@
-import { useState, useEffect, useRef } from "react";
+import { createContext, useState, useEffect } from "react";
+import axios from "axios";
 import API_URL from "../config";
 
-const AutoComplete = ({ value, onChange, placeholder, excludeValues = [] }) => {
-  const [suggestions, setSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [inputValue, setInputValue] = useState(value);
-  const inputRef = useRef(null);
+const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  axios.defaults.baseURL = API_URL + "/api";
 
   useEffect(() => {
-    setInputValue(value);
-  }, [value]);
+    const validateToken = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          const config = {
+            headers: { Authorization: `Bearer ${token}` },
+          };
+          const { data } = await axios.get("/auth/validate", config);
+          setUser(data);
+        } catch (error) {
+          localStorage.removeItem("token");
+          setError(
+            error.response?.data?.message ||
+              "Session expired. Please login again."
+          );
+        }
+      }
+      setLoading(false);
+    };
 
-  const fetchSuggestions = async (query) => {
-    if (!query) {
-      setSuggestions([]);
-      return;
-    }
+    validateToken();
+  }, []);
 
+  const login = async (credentials) => {
     try {
-      const response = await fetch(
-        `${API_URL}/api/match/suggestions?query=${encodeURIComponent(
-          query
-        )}`
-      );
-      const data = await response.json();
-      // Filter out already selected names
-      const filteredSuggestions = data.filter(
-        (user) => !excludeValues.includes(user.fullName)
-      );
-      setSuggestions(filteredSuggestions);
+      const { data } = await axios.post("/auth/login", credentials);
+      localStorage.setItem("token", data.token);
+      setUser(data.user);
+      setError(null);
+      return data;
     } catch (error) {
-      console.error("Error fetching suggestions:", error);
-      setSuggestions([]);
+      setError(error.response?.data?.message || "Login failed");
+      throw error;
     }
   };
 
-  const handleInputChange = (e) => {
-    const value = e.target.value;
-    setInputValue(value);
-    fetchSuggestions(value);
-    setShowSuggestions(true);
+  const register = async (userData) => {
+    try {
+      const { data } = await axios.post("/auth/signup", userData);
+      setError(null);
+      return data;
+    } catch (error) {
+      setError(error.response?.data?.message || "Registration failed");
+      throw error;
+    }
   };
 
-  const handleSuggestionClick = (suggestion) => {
-    setInputValue(suggestion.fullName);
-    onChange(suggestion.fullName);
-    setSuggestions([]);
-    setShowSuggestions(false);
+  const logout = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+    setError(null);
   };
+
+  const clearError = () => setError(null);
 
   return (
-    <div className="relative w-full">
-      <input
-        ref={inputRef}
-        type="text"
-        value={inputValue}
-        onChange={handleInputChange}
-        onFocus={() => setShowSuggestions(true)}
-        placeholder={placeholder}
-        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
-      />
-      {showSuggestions && suggestions.length > 0 && (
-        <ul className="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-48 overflow-y-auto">
-          {suggestions.map((suggestion) => (
-            <li
-              key={suggestion._id}
-              onClick={() => handleSuggestionClick(suggestion)}
-              className="px-4 py-2 hover:bg-pink-50 cursor-pointer flex justify-between items-center"
-            >
-              <span>{suggestion.fullName}</span>
-              <span className="text-sm text-gray-500">
-                {suggestion.branch} - {suggestion.year} Year
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        error,
+        login,
+        logout,
+        register,
+        clearError,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
   );
 };
 
-export default AutoComplete;
+export default AuthContext;
