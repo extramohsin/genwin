@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 const Match = require("../models/Match");
 const User = require("../models/User");
 
+const { adminAuth } = require("../middleware/adminAuthMiddleware");
+
 const router = express.Router();
 
 // Admin credentials (in production, use environment variables)
@@ -24,25 +26,6 @@ router.post("/login", asyncHandler(async (req, res) => {
   }
 }));
 
-// Admin middleware
-const adminAuth = (req, res, next) => {
-  try {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) {
-      return res.status(401).json({ error: "No token provided" });
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded.isAdmin) {
-      return res.status(403).json({ error: "Not authorized" });
-    }
-
-    next();
-  } catch (error) {
-    res.status(401).json({ error: "Invalid token" });
-  }
-};
-
 // Get all matches with user details
 router.get("/matches", adminAuth, asyncHandler(async (req, res) => {
   const matches = await Match.aggregate([
@@ -56,10 +39,44 @@ router.get("/matches", adminAuth, asyncHandler(async (req, res) => {
     },
     { $unwind: "$user" },
     {
+      $lookup: {
+        from: "users",
+        localField: "crush",
+        foreignField: "_id",
+        as: "crushUrl"
+      }
+    },
+    { $unwind: { path: "$crushUrl", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "like",
+        foreignField: "_id",
+        as: "likeUrl"
+      }
+    },
+    { $unwind: { path: "$likeUrl", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "adore",
+        foreignField: "_id",
+        as: "adoreUrl"
+      }
+    },
+    { $unwind: { path: "$adoreUrl", preserveNullAndEmptyArrays: true } },
+    {
       $project: {
-        "user.password": 0,
-        "user.__v": 0,
-        __v: 0
+        user: {
+            fullName: "$user.fullName",
+            email: "$user.email",
+            branch: "$user.branch",
+            year: "$user.year"
+        },
+        crush: "$crushUrl.fullName",
+        like: "$likeUrl.fullName",
+        adore: "$adoreUrl.fullName",
+        createdAt: 1
       }
     }
   ]);

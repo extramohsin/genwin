@@ -6,11 +6,23 @@ const matchSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      unique: true, // Ensures each user can submit only once
+      unique: true,
     },
-    crush: { type: String, required: true },
-    like: { type: String, required: true },
-    adore: { type: String, required: true },
+    crush: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    like: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    adore: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     resultsVisibleDate: {
       type: Date,
       default: () => new Date(+new Date() + 7*24*60*60*1000) // 7 days from submission

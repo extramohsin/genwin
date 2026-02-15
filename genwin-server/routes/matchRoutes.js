@@ -1,192 +1,178 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
+const mongoose = require("mongoose");
 const Match = require("../models/Match");
 const User = require("../models/User");
-const mongoose = require("mongoose");
 
 const router = express.Router();
 
-// Submit match preferences
-router.post("/submit", asyncHandler(async (req, res) => {
-  try {
+// 🕒 GLOBAL REVEAL CONFIGURATION
+// You can move this to .env later: process.env.REVEAL_DATE
+const REVEAL_DATE = new Date("2026-02-15T20:00:00"); // Example: Sunday 8PM
+
+// ✅ SUBMIT MATCH PREFERENCES (One-time only, strict validation)
+router.post(
+  "/submit",
+  asyncHandler(async (req, res) => {
     const { userId, crush, like, adore } = req.body;
 
-    // Validate inputs
+    // 1. Basic Validation
     if (!userId || !crush || !like || !adore) {
-      return res.status(400).json({ error: "All fields are required" });
+      return res.status(400).json({ message: "All fields are required." });
     }
 
-    // Check if names exist in the database
-    const selectedNames = [crush, like, adore];
-    const existingUsers = await User.find({ fullName: { $in: selectedNames } });
+    // 2. Check strict one-time submission rule
+    const existingMatch = await Match.findOne({ userId });
+    if (existingMatch) {
+      return res.status(409).json({ message: "You have already submitted your choices." });
+    }
+
+    // 3. Validate that selected users actually exist in DB
+    // We expect basic User IDs (ObjectIds) to be sent from frontend
+    const selectedIds = [crush, like, adore];
     
-    if (existingUsers.length !== 3) {
-      return res.status(400).json({ 
-        error: "One or more selected names are not registered users" 
-      });
+    // ALLOW DUPLICATES: removed the check for new Set(selectedIds).size !== 3
+
+    const validUsers = await User.find({ _id: { $in: selectedIds } });
+    // We just need to make sure the users exist. If duplicates are allowed, 
+    // validUsers.length might be less than 3 if they selected the same person 3 times.
+    // So we check if all selected IDs resolve to a valid user.
+    
+    const validUserIds = validUsers.map(u => u._id.toString());
+    const allExist = selectedIds.every(id => validUserIds.includes(id));
+
+    if (!allExist) {
+      return res.status(400).json({ message: "One or more selected users do not exist." });
     }
 
-    // Prevent duplicate selections
-    if (new Set(selectedNames).size !== 3) {
-      return res.status(400).json({ 
-        error: "Please select different names for each category" 
-      });
-    }
-
-    // Create or update match with results visible after 7 days
-    const match = await Match.findOneAndUpdate(
-      { userId: new mongoose.Types.ObjectId(userId) },
-      { 
-        crush, 
-        like, 
-        adore,
-        resultsVisibleDate: new Date(+new Date() + 7*24*60*60*1000)
-      },
-      { new: true, upsert: true }
-    );
-
-    res.status(201).json({
-      message: "Match preferences submitted successfully! Results will be visible in 7 days.",
-      resultsVisibleDate: match.resultsVisibleDate
+    // 4. Save Submission
+    const newMatch = new Match({
+      userId,
+      crush,
+      like,
+      adore,
     });
-  } catch (err) {
-    console.error("Error submitting match:", err);
-    res.status(500).json({ error: "Server error, please try again later" });
-  }
-}));
 
-// Get match results
-router.get("/results/:userId", asyncHandler(async (req, res) => {
-  try {
+    await newMatch.save();
+
+    res.status(201).json({ message: "Choices locked in successfully! 💘" });
+  })
+);
+
+// ✅ GET MATCH STATUS (Locked/Unlocked & Countdown)
+router.get(
+  "/status/:userId",
+  asyncHandler(async (req, res) => {
     const { userId } = req.params;
-
-    // Get user's match
-    const userMatch = await Match.findOne({ 
-      userId: new mongoose.Types.ObjectId(userId) 
-    }).populate('userId', 'fullName');
-
-    if (!userMatch) {
-      return res.status(404).json({ 
-        error: "No match submission found" 
-      });
-    }
-
-    // Check if results are ready to be shown
-    if (new Date() < userMatch.resultsVisibleDate) {
-      const timeRemaining = userMatch.resultsVisibleDate - new Date();
-      const daysRemaining = Math.ceil(timeRemaining / (1000 * 60 * 60 * 24));
-      
-      return res.json({
-        status: "pending",
-        message: `Results will be visible in ${daysRemaining} days`,
-        resultsVisibleDate: userMatch.resultsVisibleDate,
-        userSelections: {
-          crush: userMatch.crush,
-          like: userMatch.like,
-          adore: userMatch.adore
-        }
-      });
-    }
-
-    // Get current user's name
-    const currentUser = await User.findById(userId);
-    if (!currentUser) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    // Find mutual matches
-    const mutualMatches = await Match.aggregate([
-      {
-        $match: {
-          userId: { $ne: new mongoose.Types.ObjectId(userId) },
-          $or: [
-            { crush: currentUser.fullName },
-            { like: currentUser.fullName },
-            { adore: currentUser.fullName }
-          ]
-        }
-      },
-      {
-        $lookup: {
-          from: "users",
-          localField: "userId",
-          foreignField: "_id",
-          as: "user"
-        }
-      },
-      { $unwind: "$user" },
-      {
-        $project: {
-          matchedUser: "$user.fullName",
-          branch: "$user.branch",
-          year: "$user.year",
-          theyLikedYouAs: {
-            $cond: [
-              { $eq: ["$crush", currentUser.fullName] },
-              "crush",
-              {
-                $cond: [
-                  { $eq: ["$like", currentUser.fullName] },
-                  "like",
-                  "adore"
-                ]
-              }
-            ]
-          },
-          youLikedThemAs: {
-            $cond: [
-              { $eq: [userMatch.crush, "$user.fullName"] },
-              "crush",
-              {
-                $cond: [
-                  { $eq: [userMatch.like, "$user.fullName"] },
-                  "like",
-                  "adore"
-                ]
-              }
-            ]
-          }
-        }
-      }
-    ]);
+    const match = await Match.findOne({ userId }).populate("crush like adore", "fullName");
+    
+    const now = new Date();
+    const isLocked = now < REVEAL_DATE;
+    const remainingTime = REVEAL_DATE - now;
 
     res.json({
-      status: "ready",
-      userSelections: {
-        crush: userMatch.crush,
-        like: userMatch.like,
-        adore: userMatch.adore
-      },
-      matches: mutualMatches.map(match => ({
-        ...match,
-        matchDescription: `You liked them as "${match.youLikedThemAs}", they liked you as "${match.theyLikedYouAs}"!`
-      }))
+      submitted: !!match,
+      choices: match ? [match.crush?.fullName, match.like?.fullName, match.adore?.fullName].filter(Boolean) : [],
+      isLocked,
+      nextRevealAt: REVEAL_DATE,
+      remainingTime: remainingTime > 0 ? remainingTime : 0,
     });
-  } catch (err) {
-    console.error("Error getting match results:", err);
-    res.status(500).json({ error: "Server error, please try again later" });
-  }
-}));
+  })
+);
 
-// Get name suggestions
-router.get("/suggestions", asyncHandler(async (req, res) => {
-  try {
-    const { query } = req.query;
-    if (!query) {
-      return res.json([]);
+// ✅ GET MATCH RESULTS (Mutual Matches Only)
+router.get(
+  "/results/:userId",
+  asyncHandler(async (req, res) => {
+    const { userId } = req.params;
+
+    // 1. Check Lock Status
+    if (new Date() < REVEAL_DATE) {
+      return res.status(403).json({ 
+        message: "Results are still locked!",
+        locked: true,
+        nextRevealAt: REVEAL_DATE 
+      });
     }
 
-    const users = await User.find({
-      fullName: { $regex: query, $options: 'i' },
-    })
-    .select('fullName branch year')
-    .limit(10);
+    // 2. Get User's Submission
+    const myMatch = await Match.findOne({ userId });
+    if (!myMatch) {
+      return res.json({ matches: [] }); // User never submitted
+    }
+
+    // 3. Find Mutual Matches
+    // We need to check if the people I selected (Crush/Like/Adore) also selected Me
+    
+    const mySelections = [
+      { id: myMatch.crush, type: "Crush" },
+      { id: myMatch.like, type: "Like" },
+      { id: myMatch.adore, type: "Adore" }
+    ];
+
+    const mutualMatches = [];
+
+    for (const selection of mySelections) {
+      // Find the other person's match document
+      const theirMatch = await Match.findOne({ userId: selection.id });
+
+      if (theirMatch) {
+        // Check if they selected me in any category
+        let theyLikedMeAs = null;
+        if (theirMatch.crush.toString() === userId) theyLikedMeAs = "Crush";
+        else if (theirMatch.like.toString() === userId) theyLikedMeAs = "Like";
+        else if (theirMatch.adore.toString() === userId) theyLikedMeAs = "Adore";
+
+        if (theyLikedMeAs) {
+          // It's a match! Fetch their details
+          const matchedUser = await User.findById(selection.id).select("fullName username branch year email");
+          
+          mutualMatches.push({
+            fullName: matchedUser.fullName,
+            username: matchedUser.username,
+            branch: matchedUser.branch,
+            year: matchedUser.year,
+            email: matchedUser.email,
+            myType: selection.type,
+            theirType: theyLikedMeAs,
+            type: `${selection.type} ↔ ${theyLikedMeAs}`
+          });
+        }
+      }
+    }
+
+    res.json({
+      locked: false,
+      matches: mutualMatches
+    });
+  })
+);
+
+// ✅ SEARCH USERS (For Autocomplete)
+router.get(
+  "/search",
+  asyncHandler(async (req, res) => {
+    const { query, excludedUserId } = req.query;
+    console.log("API Search Query:", query, "Excluding:", excludedUserId); // DEBUG
+    if (!query || query.length < 2) return res.json([]);
+
+    const filter = {
+      $or: [
+        { fullName: { $regex: query, $options: "i" } },
+        { username: { $regex: query, $options: "i" } }
+      ]
+    };
+
+    if (excludedUserId) {
+        filter._id = { $ne: excludedUserId };
+    }
+
+    const users = await User.find(filter).select("fullName username branch year _id").limit(10);
+    
+    console.log("API Search Results:", users.length); // DEBUG
 
     res.json(users);
-  } catch (err) {
-    console.error("Error fetching suggestions:", err);
-    res.status(500).json({ error: "Server error" });
-  }
-}));
+  })
+);
 
 module.exports = router;

@@ -7,13 +7,23 @@ const rateLimit = require("express-rate-limit");
 const authRoutes = require("./routes/authRoutes");
 const matchRoutes = require("./routes/matchRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const feedbackRoutes = require("./routes/feedbackRoutes");
 
 const app = express();
 
 // ✅ Middleware
-app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// ✅ CORS Configuration (Consolidated)
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://genwin-frontend.onrender.com"
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+}));
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -21,10 +31,12 @@ const limiter = rateLimit({
 });
 
 app.use("/api/", limiter);
+
 // ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/match", matchRoutes);
-app.use("/api/admin", adminRoutes); // Add this line
+app.use("/api/admin", adminRoutes);
+app.use("/api/feedback", feedbackRoutes);
 
 // ✅ Default Route
 app.get("/", (req, res) => {
@@ -51,33 +63,19 @@ const connectDB = async () => {
 // ✅ Start Server after DB Connection
 const startServer = async () => {
   await connectDB();
-  // Add this near your other imports
-  const path = require("path");
-
-  // Add cors configuration
-  app.use(
-    cors({
-      origin: [
-        "http://localhost:5173",
-        "https://genwin-frontend.onrender.com",
-      ],
-      credentials: true,
-    })
-  );
-
-  // Add this before your routes
+  
+  // Production static files
   if (process.env.NODE_ENV === "production") {
+    const path = require("path");
     app.use(express.static(path.join(__dirname, "../genwin-client/dist")));
+    
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(__dirname, '../genwin-client/dist', 'index.html'));
+    });
   }
 
-  // Update your port configuration
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => console.log(`🚀 Server is running on port ${PORT}`));
 };
 
 startServer();
-app.use(cors({
-  origin: "https://genwin-frontend.onrender.com",
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
-}));

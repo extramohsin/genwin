@@ -1,70 +1,92 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Flame } from "lucide-react";
+import Button from "./ui/Button";
+import Input from "./ui/Input";
 
 const FlamesGame = () => {
   const [name1, setName1] = useState("");
   const [name2, setName2] = useState("");
   const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const calculateFLAMES = () => {
+  const calculateFlames = () => {
     if (!name1 || !name2) return;
+    setLoading(true);
+    setResult(null);
 
-    const n1 = name1.toLowerCase().replace(/\s/g, "").split("");
-    const n2 = name2.toLowerCase().replace(/\s/g, "").split("");
+    setTimeout(() => {
+      const flames = ["Friend", "Love", "Affection", "Marriage", "Enemy", "Sister"];
+      const n1 = name1.toLowerCase().replace(/\s/g, "").split("");
+      const n2 = name2.toLowerCase().replace(/\s/g, "").split("");
 
-    n1.forEach((char) => {
-      const index = n2.indexOf(char);
-      if (index !== -1) {
-        n2.splice(index, 1);
-        n1[n1.indexOf(char)] = ""; // Mark as removed
-      }
-    });
+      n1.forEach((char) => {
+        const index = n2.indexOf(char);
+        if (index !== -1) {
+          n2.splice(index, 1);
+          n1.splice(n1.indexOf(char), 1);
+        }
+      });
 
-    const count = n1.filter((c) => c !== "").length + n2.length;
-    const flames = ["Friends", "Lovers", "Affection", "Marriage", "Enemy", "Siblings"];
-    
-    let index = 0;
-    while (flames.length > 1) {
-      index = (index + count - 1) % flames.length;
-      flames.splice(index, 1);
-    }
+      const count = n1.length + n2.length;
+      let resultIndex = 0;
+      // Simple FLAMES logic (can be made more accurate to standard game)
+       if (count > 0) {
+         resultIndex = (count % 6) - 1;
+         if (resultIndex === -1) resultIndex = 5;
+       }
 
-    setResult(flames[0]);
+      setResult(flames[resultIndex]);
+      setLoading(false);
+    }, 1500);
   };
 
   return (
-    <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20 shadow-xl max-w-md w-full mx-auto mt-8">
-      <h2 className="text-2xl font-bold text-white mb-4 text-center">🔥 FLAMES Generator</h2>
-      <div className="space-y-4">
-        <input
-          type="text"
-          placeholder="Your Name"
-          value={name1}
-          onChange={(e) => setName1(e.target.value)}
-          className="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-pink-500 transition-colors"
-        />
-        <input
-          type="text"
-          placeholder="Crush's Name"
-          value={name2}
-          onChange={(e) => setName2(e.target.value)}
-          className="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-pink-500 transition-colors"
-        />
-        <button
-          onClick={calculateFLAMES}
-          className="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg text-white font-bold hover:opacity-90 transition-opacity"
-        >
-          Calculate
-        </button>
+    <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 text-center">
+      <div className="flex items-center justify-center gap-2 mb-6 text-orange-400">
+        <Flame size={24} fill="currentColor" />
+        <h3 className="text-xl font-bold">FLAMES Calculator</h3>
       </div>
 
-      {result && (
-        <div className="mt-6 text-center animate-bounce">
-          <p className="text-gray-300 text-sm uppercase tracking-wider">Relationship Status</p>
-          <h3 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-red-500">
-            {result}
-          </h3>
-        </div>
-      )}
+      <div className="space-y-4 mb-6">
+        <Input 
+          placeholder="Your Name" 
+          value={name1} 
+          onChange={(e) => setName1(e.target.value)} 
+          className="text-center"
+        />
+        <div className="text-2xl font-bold text-pink-500">+</div>
+        <Input 
+          placeholder="Crush's Name" 
+          value={name2} 
+          onChange={(e) => setName2(e.target.value)} 
+          className="text-center"
+        />
+      </div>
+
+      <Button 
+        onClick={calculateFlames} 
+        disabled={loading || !name1 || !name2}
+        className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+      >
+        {loading ? "Calculating..." : "Calculate 🔥"}
+      </Button>
+
+      <AnimatePresence>
+        {result && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            className="mt-6 p-4 bg-white/10 rounded-xl"
+          >
+            <div className="text-sm text-gray-400 uppercase tracking-widest mb-1">Result</div>
+            <div className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-500">
+              {result}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

@@ -6,7 +6,13 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+    },
+    username: {
+      type: String,
+      required: true,
       unique: true,
+      lowercase: true,
+      trim: true,
     },
     email: {
       type: String,
@@ -23,6 +29,11 @@ const UserSchema = new mongoose.Schema(
     },
     branch: { type: String, default: "" },
     year: { type: String, default: "" },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
   },
   { timestamps: true }
 );
