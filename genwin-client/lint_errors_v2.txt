@@ -1,0 +1,13 @@
+﻿
+> genwin-client@0.0.0 lint
+> eslint .
+
+
+C:\Users\MOHSIN MALIK\Desktop\genwin\genwin-client\src\components\games\DestinyWheel.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\MOHSIN MALIK\Desktop\genwin\genwin-client\src\pages\WaitingRoom.jsx
+  31:17  error  Empty block statement  no-empty
+
+Γ£û 2 problems (2 errors, 0 warnings)
+

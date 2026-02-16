@@ -7,19 +7,12 @@ const UserSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    username: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-      lowercase: true,
-    },
     email: {
       type: String,
       required: true,
       unique: true,
-      lowercase: true,
       trim: true,
+      lowercase: true,
       match: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
     },
     password: {
@@ -27,8 +20,16 @@ const UserSchema = new mongoose.Schema(
       required: true,
       minlength: 6,
     },
-    branch: { type: String, default: "" },
-    year: { type: String, default: "" },
+    branch: { 
+      type: String, 
+      required: true,
+      trim: true 
+    },
+    year: { 
+      type: String, 
+      required: true,
+      trim: true 
+    },
   },
   { timestamps: true }
 );

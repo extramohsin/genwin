@@ -23,21 +23,30 @@ router.get(
   })
 );
 
-// ✅ SEARCH USERS (For Autocomplete)
+const { protect } = require("../middleware/authMiddleware"); // Import protect middleware
+
+// ✅ SEARCH USERS (For Autocomplete) - PROTECTED to exclude self
 router.get(
   "/search",
+  protect, 
   asyncHandler(async (req, res) => {
     const { q } = req.query;
+    const currentUserId = req.user._id;
 
     if (!q) {
       return res.status(400).json({ users: [] });
     }
 
     const users = await User.find({
-      username: { $regex: q, $options: "i" }, // Case-insensitive partial match
+      _id: { $ne: currentUserId }, // Exclude current user
+      $or: [
+        { fullName: { $regex: q, $options: "i" } },
+        // We still allow searching by email if they know it, but we won't return it
+        { email: { $regex: q, $options: "i" } }
+      ]
     })
-      .select("username branch year -_id")
-      .limit(5); // Limit suggestions
+      .select("_id fullName branch year") // RETURN ONLY THESE FIELDS (NO EMAIL)
+      .limit(5);
 
     res.json({ users });
   })

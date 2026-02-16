@@ -1,130 +1,220 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
+const { protect } = require("../middleware/authMiddleware");
 const Match = require("../models/Match");
 const User = require("../models/User");
-const mongoose = require("mongoose");
+const { toZonedTime } = require("date-fns-tz");
 
 const router = express.Router();
 
-// ✅ SUBMIT MATCH CHOICES
+// --- HELPER: Get Reveal Dates ---
+const getRevealDates = () => {
+  const timeZone = process.env.TIMEZONE || "Asia/Kolkata";
+  const targetDay = parseInt(process.env.REVEAL_DAY) || 0; // 0 = Sunday
+  const targetHour = parseInt(process.env.REVEAL_HOUR) || 20;
+  const targetMinute = parseInt(process.env.REVEAL_MINUTE) || 0;
+
+  const now = new Date();
+  const zonedNow = toZonedTime(now, timeZone);
+  
+  // Calculate NEXT Reveal
+  let nextReveal = new Date(zonedNow);
+  nextReveal.setHours(targetHour, targetMinute, 0, 0);
+
+  if (zonedNow.getDay() === targetDay) {
+    if (zonedNow > nextReveal) {
+      nextReveal.setDate(nextReveal.getDate() + 7);
+    }
+  } else {
+    const daysUntil = (targetDay + 7 - zonedNow.getDay()) % 7;
+    nextReveal.setDate(nextReveal.getDate() + daysUntil);
+  }
+
+  // Calculate PREVIOUS Reveal
+  let prevReveal = new Date(nextReveal);
+  prevReveal.setDate(prevReveal.getDate() - 7);
+
+  return { nextReveal, prevReveal, zonedNow };
+};
+
+// --- ROUTES ---
+
+// @desc    Submit Match Choices
+// @route   POST /api/match/submit
+// @access  Private
 router.post(
   "/submit",
+  protect,
   asyncHandler(async (req, res) => {
-    const { userId, crush, like, adore } = req.body;
+    const userId = req.user._id;
 
-    if (!userId || !crush || !like || !adore) {
-      return res.status(400).json({ error: "All fields are required" });
+    // 0. Check if already submitted
+    const existingMatch = await Match.findOne({ userId });
+    if (existingMatch) {
+      return res.status(409).json({ message: "You have already submitted your choices." });
+    }
+    const { crushId, likeId, adoreId } = req.body;
+
+    if (!crushId || !likeId || !adoreId) {
+      return res.status(400).json({ message: "All 3 choices are required." });
     }
 
-    // Check if usernames exist
-    const crushUser = await User.findOne({ username: crush.toLowerCase() });
-    const likeUser = await User.findOne({ username: like.toLowerCase() });
-    const adoreUser = await User.findOne({ username: adore.toLowerCase() });
+    // 1. Check if ANY are the same (No duplicates allowed) - REMOVED PER USER REQUEST
+    // if (crushId === likeId || crushId === adoreId || likeId === adoreId) {
+    //   return res.status(400).json({ message: "You cannot select the same person twice!" });
+    // }
+
+    // 2. Check if user selected themselves (Double check via IDs)
+    const currentUserId = req.user._id.toString();
+    if ([crushId, likeId, adoreId].includes(currentUserId)) {
+        return res.status(400).json({ message: "You cannot choose yourself! 😆" });
+    }
+
+    // 3. Verify Users Exist (By ID)
+    const [crushUser, likeUser, adoreUser] = await Promise.all([
+      User.findById(crushId),
+      User.findById(likeId),
+      User.findById(adoreId)
+    ]);
 
     if (!crushUser || !likeUser || !adoreUser) {
-        let invalid = [];
-        if(!crushUser) invalid.push(crush);
-        if(!likeUser) invalid.push(like);
-        if(!adoreUser) invalid.push(adore);
-        return res.status(400).json({ error: `Users not found: ${invalid.join(", ")}` });
+      return res.status(404).json({ message: "One or more users not found." });
     }
 
-    // Default delay: 3 days (can be overridden by env)
-    const delayDays = parseInt(process.env.REVEAL_DELAY_DAYS) || 3;
-    const revealDate = new Date();
-    revealDate.setDate(revealDate.getDate() + delayDays);
+    // 4. Save Match
+    const newMatch = new Match({
+      userId: req.user._id,
+      crushUserId: crushUser._id,
+      likeUserId: likeUser._id,
+      adoreUserId: adoreUser._id,
+      crush: crushUser.email, // Store email for admin/backup reference
+      like: likeUser.email,
+      adore: adoreUser.email
+    });
 
-    const matchEntry = await Match.findOneAndUpdate(
-      { userId },
-      {
-        userId,
-        crush: crush.toLowerCase(),
-        like: like.toLowerCase(),
-        adore: adore.toLowerCase(),
-        revealDate,
-      },
-      { new: true, upsert: true } // Create if not exists, update if exists
-    );
+    await newMatch.save(); // Added this line to actually save the newMatch
 
-    res.status(201).json({ message: "Choices submitted successfully!", revealDate: matchEntry.revealDate });
+    res.status(201).json({ message: "Choices locked in successfully!" });
   })
 );
 
-// ✅ GET MATCH STATUS (Check if submitted and if results ready)
+// @desc    Get Match Status
+// @route   GET /api/match/status
+// @access  Private
 router.get(
-  "/status/:userId",
+  "/status",
+  protect,
   asyncHandler(async (req, res) => {
-    const { userId } = req.params;
+    const userId = req.user._id;
+    const match = await Match.findOne({ userId });
     
-    const matchEntry = await Match.findOne({ userId });
+    const { nextReveal, prevReveal, zonedNow } = getRevealDates();
 
-    if (!matchEntry) {
-      return res.json({ submitted: false });
-    }
+    // Reveal Window Logic: 
+    // We unlock results if we are within X hours of the Previous Reveal
+    // e.g., 24 Hours Window from Sunday 8PM to Monday 8PM
+    const revealWindowHours = 24; 
+    const windowEnd = new Date(prevReveal);
+    windowEnd.setHours(windowEnd.getHours() + revealWindowHours);
 
-    const now = new Date();
-    const isReady = now >= matchEntry.revealDate;
+    const isRevealWindow = zonedNow >= prevReveal && zonedNow < windowEnd;
+    
+    // If we are in the window, status is UNLOCKED
+    // If not, we are counting down to NEXT reveal
+    const isLocked = !isRevealWindow;
+
+    const remainingTime = isLocked 
+        ? Math.max(0, nextReveal.getTime() - zonedNow.getTime())
+        : 0;
 
     res.json({
-      submitted: true,
-      revealDate: matchEntry.revealDate,
-      isReady,
+      hasSubmitted: !!match,
+      isLocked,
+      remainingTime,
+      nextRevealAt: nextReveal.toISOString(),
+      isRevealWindow // Optional for frontend debug
     });
   })
 );
 
-// ✅ GET RESULTS (Only if reveal date passed)
+// @desc    Get Match Results
+// @route   GET /api/match/result
+// @access  Private
 router.get(
-  "/result/:userId",
+  "/result",
+  protect,
   asyncHandler(async (req, res) => {
-    const { userId } = req.params;
-    const matchEntry = await Match.findOne({ userId });
+    const userId = req.user._id;
+    const { nextReveal, prevReveal, zonedNow } = getRevealDates();
+    
+    // Uncomment to enforce lock
+    // const revealWindowHours = 24; 
+    // const windowEnd = new Date(prevReveal);
+    // windowEnd.setHours(windowEnd.getHours() + revealWindowHours);
+    // const isRevealWindow = zonedNow >= prevReveal && zonedNow < windowEnd;
 
-    if (!matchEntry) {
-      return res.status(404).json({ error: "No choices submitted yet." });
+    // if (!isRevealWindow) {
+    //      // return res.status(403).json({ message: "Results are currently locked." });
+    // }
+
+    // 1. Get My Choices
+    const myMatch = await Match.findOne({ userId });
+    if (!myMatch) {
+        return res.status(404).json({ message: "No submission found." });
     }
 
-    // Check Reveal Date
-    if (new Date() < matchEntry.revealDate) {
-       const remainingTime = matchEntry.revealDate.getTime() - Date.now();
-       return res.status(200).json({ locked: true, remainingTime, revealDate: matchEntry.revealDate });
+    // Map my choices: ID -> Category
+    const myChoices = {};
+    if (myMatch.crushUserId) myChoices[myMatch.crushUserId.toString()] = "Crush";
+    if (myMatch.likeUserId) myChoices[myMatch.likeUserId.toString()] = "Like";
+    if (myMatch.adoreUserId) myChoices[myMatch.adoreUserId.toString()] = "Adore";
+
+    const mySelectedIds = Object.keys(myChoices);
+
+    if (mySelectedIds.length === 0) {
+        return res.json({ locked: false, matches: [], count: 0 });
     }
 
-    // Retrieve current user username to check against others
-    const currentUser = await User.findById(userId);
-    if (!currentUser) return res.status(404).json({ error: "User not found" });
+    // 2. Find Matches of people I selected
+    // We look for any Match document where the userId is one of the people I selected
+    const potentialMatches = await Match.find({ 
+        userId: { $in: mySelectedIds } 
+    }).populate('userId', 'fullName branch year email');
 
-    const myUsername = currentUser.username;
-    let matches = [];
+    const confirmedMatches = [];
 
-    // Helper to check mutual
-    const checkMutual = async (targetUsername) => {
-       const targetUser = await User.findOne({ username: targetUsername });
-       if (!targetUser) return null;
+    // 3. Check for MUTUALITY (Cross-Slot)
+    // For each person I selected, did they select me back?
+    potentialMatches.forEach(theirMatch => {
+        const theirId = theirMatch.userId._id.toString();
+        const myIdStr = userId.toString();
 
-       const targetMatch = await Match.findOne({ userId: targetUser._id });
-       if (!targetMatch) return null;
+        let theirCategory = null;
 
-       const targetChoices = [targetMatch.crush, targetMatch.like, targetMatch.adore];
-       if (targetChoices.includes(myUsername)) {
-           return { username: targetUser.username, fullName: targetUser.fullName };
-       }
-       return null;
-    };
+        // Did they select me in ANY slot?
+        if (theirMatch.crushUserId && theirMatch.crushUserId.toString() === myIdStr) theirCategory = "Crush";
+        else if (theirMatch.likeUserId && theirMatch.likeUserId.toString() === myIdStr) theirCategory = "Like";
+        else if (theirMatch.adoreUserId && theirMatch.adoreUserId.toString() === myIdStr) theirCategory = "Adore";
 
-    const crushMatch = await checkMutual(matchEntry.crush);
-    if (crushMatch) matches.push({ ...crushMatch, type: "Crush" });
-
-    const likeMatch = await checkMutual(matchEntry.like);
-    if (likeMatch) matches.push({ ...likeMatch, type: "Like" });
-
-    const adoreMatch = await checkMutual(matchEntry.adore);
-    if (adoreMatch) matches.push({ ...adoreMatch, type: "Adore" });
+        if (theirCategory) {
+            confirmedMatches.push({
+                matchedUser: {
+                    _id: theirMatch.userId._id, // Send ID for copying
+                    fullName: theirMatch.userId.fullName,
+                    branch: theirMatch.userId.branch,
+                    year: theirMatch.userId.year
+                    // Email hidden intentionally from results
+                },
+                myCategory: myChoices[theirId], // What I picked them as
+                theirCategory: theirCategory      // What they picked me as
+            });
+        }
+    });
 
     res.json({
         locked: false,
-        matches,
-        count: matches.length
+        matches: confirmedMatches,
+        count: confirmedMatches.length
     });
   })
 );

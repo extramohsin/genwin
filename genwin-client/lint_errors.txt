@@ -1,0 +1,43 @@
+﻿
+> genwin-client@0.0.0 lint
+> eslint .
+
+
+C:\Users\MOHSIN MALIK\Desktop\genwin\genwin-client\src\components\Navbar.jsx
+  3:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\MOHSIN MALIK\Desktop\genwin\genwin-client\src\components\games\CrushAnalyzer.jsx
+  1:20  error  'useEffect' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u     no-unused-vars
+
+C:\Users\MOHSIN MALIK\Desktop\genwin\genwin-client\src\components\games\DestinyWheel.jsx
+  1:20  error  'useRef' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\MOHSIN MALIK\Desktop\genwin\genwin-client\src\components\ui\Button.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\MOHSIN MALIK\Desktop\genwin\genwin-client\src\components\ui\GlassCard.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\MOHSIN MALIK\Desktop\genwin\genwin-client\src\components\ui\Input.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\MOHSIN MALIK\Desktop\genwin\genwin-client\src\components\ui\PageWrapper.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\MOHSIN MALIK\Desktop\genwin\genwin-client\src\pages\AdminDashboard.jsx
+  85:16  error  'error' is defined but never used  no-unused-vars
+
+C:\Users\MOHSIN MALIK\Desktop\genwin\genwin-client\src\pages\Home.jsx
+    5:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  253:45  error  'Icon' is defined but never used                                               no-unused-vars
+
+C:\Users\MOHSIN MALIK\Desktop\genwin\genwin-client\src\pages\LandingPage.jsx
+  103:30  error  'Icon' is defined but never used  no-unused-vars
+
+C:\Users\MOHSIN MALIK\Desktop\genwin\genwin-client\src\pages\WaitingRoom.jsx
+  13:10  error  'loading' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+Γ£û 14 problems (14 errors, 0 warnings)
+
