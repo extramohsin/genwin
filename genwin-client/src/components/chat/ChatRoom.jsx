@@ -43,12 +43,17 @@ const ChatRoom = () => {
         const token = localStorage.getItem("token");
         if (!token) return;
 
+        // Prevent double connection
+        if (socket?.connected) return;
+
         // Use the base URL for socket connection (remove /api suffix if it exists in API_URL)
         const baseUrl = API_URL.endsWith('/api') ? API_URL.slice(0, -4) : API_URL;
 
         const newSocket = io(baseUrl, {
             auth: { token },
             transports: ["websocket", "polling"], // Try websocket first
+            reconnection: true,
+            reconnectionAttempts: 5
         });
 
         newSocket.on("connect", () => {
@@ -79,8 +84,12 @@ const ChatRoom = () => {
         .then(data => setMessages(data))
         .catch(err => console.error("History Error", err));
 
-        return () => newSocket.disconnect();
-    }, []);
+        // CLEANUP
+        return () => {
+            if (newSocket) newSocket.disconnect();
+        };
+    }, []); // Empty dependency array ensures run once (per mount)
+
 
     // Scroll to bottom
     useEffect(() => {

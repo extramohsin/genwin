@@ -3,14 +3,68 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    
+    <!-- BRANDING -->
+    <title>GENWIN | Find Your Campus Crush</title>
+    <meta name="description" content="Genwin is the #1 secure, anonymous campus dating app. Find your crush, rate your matches, and see if the feeling is mutual!" />
+    <meta name="theme-color" content="#ec4899" />
+
+    <!-- OPEN GRAPH (Social Previews) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://genwin-frontend.onrender.com/" />
+    <meta property="og:title" content="GENWIN | Find Your Campus Crush" />
+    <meta property="og:description" content="The most premium, secure, and exciting way to find your match this semester. No more guessing games—just pure destiny." />
+    <!-- Ideally replace this with a real image URL hosted on the server or a CDN -->
+    <meta property="og:image" content="https://genwin-frontend.onrender.com/og-image.png" />
+
+    <!-- TWITTER CARDS -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="GENWIN | Find Your Campus Crush" />
+    <meta name="twitter:description" content="Secure, anonymous, and fun. Find out if your crush likes you back!" />
+    <meta name="twitter:image" content="https://genwin-frontend.onrender.com/og-image.png" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+      /* INITIAL LOADER STYLES */
+      #root:empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background-color: #020617; /* dark-950 */
+        color: white;
+        font-family: 'Inter', sans-serif;
+      }
+      .initial-loader {
+        display: flex;
+        flex-col: column;
+        align-items: center;
+        gap: 1rem;
+      }
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(236, 72, 153, 0.3);
+        border-radius: 50%;
+        border-top-color: #ec4899; /* neon-pink */
+        animation: spin 1s ease-in-out infinite;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="initial-loader">
+        <div class="spinner"></div>
+        <p style="font-size: 0.875rem; color: #9ca3af; letter-spacing: 0.05em;">LOADING GENWIN...</p>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

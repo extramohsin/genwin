@@ -21,19 +21,24 @@ const Navbar = () => {
   // Close mobile menu on route change
   useEffect(() => setIsOpen(false), [location]);
 
+  const token = localStorage.getItem("token");
+  const isAuthenticated = !!token;
+
   const handleAdminLogout = () => {
     localStorage.removeItem("adminToken");
     toast.success("Admin Logged Out");
     navigate("/admin/login");
   };
 
-  const navLinks = isAdminRoute ? [
-      { name: "Dashboard", path: "/admin/dashboard" }
-  ] : [
-    { name: "Home", path: "/home" },
-    { name: "Waiting Room", path: "/waiting-room" },
-    { name: "Results", path: "/results" },
-  ];
+  const navLinks = isAdminRoute 
+    ? [{ name: "Dashboard", path: "/admin/dashboard" }]
+    : isAuthenticated
+      ? [
+          { name: "Home", path: "/home" },
+          { name: "Waiting Room", path: "/waiting-room" },
+          { name: "Results", path: "/results" },
+        ]
+      : []; // No links for public users (Landing Page)
 
   return (
     <>
@@ -92,6 +97,18 @@ const Navbar = () => {
                   <button onClick={handleAdminLogout} className="hidden md:block px-4 py-1.5 text-xs font-bold bg-red-500/20 text-red-400 border border-red-500/50 rounded-full hover:bg-red-500/30 transition-colors">
                     Logout
                   </button>
+              ) : isAuthenticated ? (
+                  <button 
+                    onClick={() => {
+                        localStorage.removeItem("token");
+                        localStorage.removeItem("user");
+                        toast.success("Logged out successfully");
+                        navigate("/login");
+                    }}
+                    className="hidden md:block px-4 py-1.5 text-xs font-bold bg-white/10 text-white border border-white/20 rounded-full hover:bg-white/20 transition-colors"
+                  >
+                    Logout
+                  </button>
               ) : (
                   <Link to="/login" className="hidden md:block">
                     <button className="px-4 py-1.5 text-xs font-bold bg-white text-dark-950 rounded-full hover:bg-gray-100 transition-colors">
@@ -131,6 +148,18 @@ const Navbar = () => {
               
               {isAdminRoute ? (
                   <button onClick={handleAdminLogout} className="text-xl font-medium text-red-400 hover:text-white">Admin Logout</button>
+              ) : isAuthenticated ? (
+                  <button 
+                    onClick={() => {
+                        localStorage.removeItem("token");
+                        localStorage.removeItem("user");
+                        toast.success("Logged out successfully");
+                        navigate("/login");
+                    }}
+                    className="text-xl font-medium text-gray-400 hover:text-white"
+                  >
+                    Logout
+                  </button>
               ) : (
                   <>
                     <Link to="/login" className="text-xl font-medium text-gray-400 hover:text-white">Login</Link>

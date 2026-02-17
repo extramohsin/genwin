@@ -11,6 +11,8 @@ import MatchResults from "./pages/MatchResults";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+
 const App = () => {
   return (
     <Router>
@@ -40,9 +42,30 @@ const App = () => {
         <Route path="/signup" element={<Register />} />
 
         {/* Protected Routes (User) */}
-        <Route path="/home" element={<Home />} />
-        <Route path="/waiting-room" element={<WaitingRoom />} />
-        <Route path="/results" element={<MatchResults />} />
+        <Route 
+          path="/home" 
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/waiting-room" 
+          element={
+            <ProtectedRoute>
+              <WaitingRoom />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/results" 
+          element={
+            <ProtectedRoute>
+              <MatchResults />
+            </ProtectedRoute>
+          } 
+        />
 
         {/* Admin Routes */}
         <Route path="/admin/login" element={<AdminLogin />} />

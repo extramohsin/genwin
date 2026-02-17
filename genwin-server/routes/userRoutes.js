@@ -37,16 +37,19 @@ router.get(
       return res.status(400).json({ users: [] });
     }
 
+    // SANITIZE QUERY: Escape special regex characters to prevent ReDoS or logic errors
+    const safeQuery = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
     const users = await User.find({
       _id: { $ne: currentUserId }, // Exclude current user
       $or: [
-        { fullName: { $regex: q, $options: "i" } },
+        { fullName: { $regex: safeQuery, $options: "i" } },
         // We still allow searching by email if they know it, but we won't return it
-        { email: { $regex: q, $options: "i" } }
+        { email: { $regex: safeQuery, $options: "i" } }
       ]
     })
       .select("_id fullName branch year") // RETURN ONLY THESE FIELDS (NO EMAIL)
-      .limit(5);
+      .limit(10); // LIMIT TO 10 RESULTS
 
     res.json({ users });
   })

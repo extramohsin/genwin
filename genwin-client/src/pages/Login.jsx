@@ -45,7 +45,7 @@ const Login = () => {
       localStorage.setItem("token", data.token);
       
       toast.success(`Welcome back, ${user.fullName || "Student"}! 💖`);
-      navigate("/waiting-room");
+      navigate("/home");
     } catch (error) {
       console.error(error);
       toast.error(error.message);

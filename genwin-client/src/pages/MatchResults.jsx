@@ -16,9 +16,20 @@ const MatchResults = () => {
 
   useEffect(() => {
     const fetchResults = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+          setLoading(false);
+          return;
+      }
+      
       try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(`${API_URL}/api/match/result`, { // Corrected endpoint singular "result"
+        const statusResponse = await fetch(`${API_URL}/api/match/status`, {
+           headers: { Authorization: `Bearer ${token}` }
+        });
+        const statusData = await statusResponse.json();
+
+        // Always fetch result if submitted, or if we want to check lock status
+        const response = await fetch(`${API_URL}/api/match/result`, { 
            headers: { Authorization: `Bearer ${token}` }
         });
         const data = await response.json();

@@ -85,4 +85,21 @@ router.post(
   })
 );
 
+const { protect } = require("../middleware/authMiddleware");
+
+// ✅ VERIFY TOKEN (For Protected Route Check)
+router.get("/me", protect, asyncHandler(async (req, res) => {
+    // If we get here, token is valid and req.user is populated
+    res.json({
+        valid: true,
+        user: {
+            userId: req.user._id,
+            email: req.user.email,
+            fullName: req.user.fullName,
+            branch: req.user.branch,
+            year: req.user.year
+        }
+    });
+}));
+
 module.exports = router;
