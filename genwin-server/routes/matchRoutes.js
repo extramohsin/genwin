@@ -59,7 +59,7 @@ router.post(
       return res.status(400).json({ message: "All 3 choices are required." });
     }
 
-    // 1. Check if ANY are the same (No duplicates allowed) - REMOVED PER USER REQUEST
+    // 1. Check if ANY are the same (No duplicates allowed) - DISABLED PER PRODUCT OWNER
     // if (crushId === likeId || crushId === adoreId || likeId === adoreId) {
     //   return res.status(400).json({ message: "You cannot select the same person twice!" });
     // }

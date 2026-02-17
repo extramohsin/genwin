@@ -83,7 +83,11 @@ const setupSocket = (io) => {
     });
 
     socket.on("disconnect", () => {
-      // Cleanup if needed
+      // Cleanup cooldowns to prevent memory leaks
+      if (socket.user && socket.user.id) {
+          userCooldowns.delete(socket.user.id);
+      }
+      console.log(`User disconnected: ${socket.user?.id}`);
     });
   });
 };

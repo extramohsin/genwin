@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/png" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
     
     <!-- BRANDING -->
@@ -30,7 +30,9 @@
     
     <style>
       /* INITIAL LOADER STYLES */
-      #root:empty {
+      /* INITIAL LOADER STYLES */
+      /* Targeted via class since #root is not empty */
+      body:has(.initial-loader) #root {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -39,10 +41,16 @@
         color: white;
         font-family: 'Inter', sans-serif;
       }
+      /* Fallback for browsers not supporting :has or just style the loader wrapper */
       .initial-loader {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background-color: #020617;
         display: flex;
-        flex-col: column;
+        flex-direction: column;
         align-items: center;
+        justify-content: center;
         gap: 1rem;
       }
       .spinner {
