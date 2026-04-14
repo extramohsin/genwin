@@ -5,13 +5,13 @@ import PageWrapper from "../components/ui/PageWrapper";
 import GlassCard from "../components/ui/GlassCard";
 import Button from "../components/ui/Button";
 import FeedbackForm from "../components/FeedbackForm";
-import ChatRoom from "../components/chat/ChatRoom";
+import NeonLoveTester from "../components/games/NeonLoveTester";
+import RedFlagSwiper from "../components/games/RedFlagSwiper";
 import DestinyWheel from "../components/games/DestinyWheel";
 import VibePoll from "../components/games/VibePoll";
 import DailyQuote from "../components/games/DailyQuote";
 import RoastMyRizz from "../components/games/RoastMyRizz";
-import NeonLoveTester from "../components/games/NeonLoveTester";
-import RedFlagSwiper from "../components/games/RedFlagSwiper";
+import { MessageSquare } from "lucide-react";
 import API_URL from "../config";
 
 const WaitingRoom = () => {
@@ -108,13 +108,41 @@ const WaitingRoom = () => {
           {/* 2. Main Grid Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
               
-              {/* Left Column: Chat (Takes 2 cols on large screen) */}
+              {/* Left Column: Game Center (Now Takes more space or shared) */}
               <div className="lg:col-span-2 space-y-6">
-                  <div className="flex items-center gap-2 mb-2">
-                       <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                       <h2 className="text-xl font-bold text-white">Anonymous Live Chat</h2>
+                  {/* Premium Chat CTA */}
+                  <Link to="/chat" className="block group transition-all hover:scale-[1.01] active:scale-[0.99]">
+                      <GlassCard className="p-8 md:p-12 relative overflow-hidden border-neon-pink/20 hover:border-neon-pink/40 shadow-xl group-hover:shadow-neon-pink/10 transition-all">
+                          {/* Decorative Background Elements */}
+                          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-neon-pink/10 rounded-full blur-[100px] pointer-events-none group-hover:bg-neon-pink/20 transition-all"></div>
+                          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 bg-neon-purple/10 rounded-full blur-[100px] pointer-events-none group-hover:bg-neon-purple/20 transition-all"></div>
+
+                          <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-12">
+                              <div className="w-20 h-20 md:w-28 md:h-28 rounded-3xl bg-gradient-to-br from-neon-pink/20 to-neon-purple/20 border border-white/20 flex items-center justify-center text-neon-pink shadow-glow-pink transition-transform group-hover:rotate-6">
+                                  <MessageSquare size={40} className="md:size-56" style={{ width: 'auto', height: '40%' }} />
+                              </div>
+                              <div className="flex-1 text-center md:text-left">
+                                  <div className="flex items-center justify-center md:justify-start gap-2 mb-3">
+                                      <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                                      <p className="text-xs font-bold text-green-500 uppercase tracking-widest">Global Room Online</p>
+                                  </div>
+                                  <h2 className="text-3xl md:text-4xl font-bold font-fredoka text-white mb-4">Enter Live Anonymous Chat</h2>
+                                  <p className="text-gray-400 text-base md:text-lg mb-6 max-w-lg">
+                                      Connect with everyone anonymously. Share your thoughts, vibes, and rizz without revealing your identity.
+                                  </p>
+                                  <div className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-white text-dark-950 font-bold text-sm md:text-base group-hover:bg-neon-pink group-hover:text-white transition-all shadow-glow-sm">
+                                      Join the Conversation
+                                      <Sparkles size={18} />
+                                  </div>
+                              </div>
+                          </div>
+                      </GlassCard>
+                  </Link>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <RedFlagSwiper />
+                    <RoastMyRizz />
                   </div>
-                  <ChatRoom />
               </div>
 
               {/* Right Column: Game Center */}
@@ -145,8 +173,6 @@ const WaitingRoom = () => {
                        <div className="p-2 min-h-[400px]">
                             {activeTab === "games" && (
                                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                    <RedFlagSwiper />
-                                    <RoastMyRizz />
                                     <NeonLoveTester />
                                 </div>
                             )}

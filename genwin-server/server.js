@@ -13,10 +13,12 @@ const feedbackRoutes = require("./routes/feedbackRoutes");
 const userRoutes = require("./routes/userRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const pollRoutes = require("./routes/pollRoutes");
+const hangoutRoutes = require("./routes/hangoutRoutes"); // New
 const setupSocket = require("./socket/chatSocket"); // Import Socket Logic
 
 const app = express();
 const server = http.createServer(app); // Create HTTP Server
+global.onlineCount = 0; // Initialize global online count
 
 // ✅ Middleware
 app.use(express.json());
@@ -61,6 +63,7 @@ app.use("/api/feedback", feedbackRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/chat", chatRoutes); // New
 app.use("/api/poll", pollRoutes); // New
+app.use("/api", hangoutRoutes); // New Hangout Routes (will map to /api/hottakes, etc.)
 
 // ✅ Default Route
 app.get("/", (req, res) => {

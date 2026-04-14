@@ -51,3 +51,35 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #ec4899; 
 }
+
+/* Animations & Custom Utilities */
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+.shadow-glow-pink {
+  box-shadow: 0 0 15px rgba(236, 72, 153, 0.5);
+}
+
+.shadow-glow-purple {
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+}
+
+.shadow-glow-cyan {
+  box-shadow: 0 0 15px rgba(34, 211, 238, 0.5);
+}

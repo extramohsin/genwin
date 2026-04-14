@@ -8,6 +8,8 @@ import Register from "./pages/Register";
 import Home from "./pages/Home";
 import WaitingRoom from "./pages/WaitingRoom";
 import MatchResults from "./pages/MatchResults";
+import ChatPage from "./pages/ChatPage";
+import HangoutZone from "./pages/HangoutZone";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 
@@ -55,6 +57,22 @@ const App = () => {
           element={
             <ProtectedRoute>
               <WaitingRoom />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/chat" 
+          element={
+            <ProtectedRoute>
+              <ChatPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/hangout" 
+          element={
+            <ProtectedRoute>
+              <HangoutZone />
             </ProtectedRoute>
           } 
         />

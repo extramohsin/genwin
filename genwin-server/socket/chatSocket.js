@@ -5,6 +5,7 @@ const ChatMessage = require("../models/ChatMessage");
 // filter.loadDictionary(); // Load default dictionary (optional if defaults are good)
 
 const userCooldowns = new Map(); // userId -> timestamp
+const activeSockets = new Map(); // socket.id -> anonName
 
 const setupSocket = (io) => {
   // Middleware: Authenticate Socket
@@ -26,12 +27,26 @@ const setupSocket = (io) => {
   io.on("connection", (socket) => {
     console.log(`User connected: ${socket.user.id}`);
 
+    // Update global online count and broadcast
+    global.onlineCount = io.engine.clientsCount;
+    io.emit("online_count", global.onlineCount);
+
     // Join Room (Global Room for simplicity)
     socket.join("waiting-room");
 
+    // Handle Join Room (Custom event for toast & strip)
+    socket.on("join_room", (anonName) => {
+      socket.anonName = anonName;
+      activeSockets.set(socket.id, anonName);
+      // Immediately blast the definitive active user array to everyone in the room
+      io.to("waiting-room").emit("sync_active_users", Array.from(new Set(activeSockets.values())));
+      // We also keep user_joined to trigger small visual entry toasts
+      socket.to("waiting-room").emit("user_joined", { anonName });
+    });
+
     // Handle Send Message
     socket.on("send_message", async (data) => {
-      const { message, anonName, replyTo } = data;
+      const { message, anonName, replyTo, isWhisper, mentionedName, quoteAnonName, quoteText } = data;
       const userId = socket.user.id;
 
       // 1. Validation
@@ -66,7 +81,11 @@ const setupSocket = (io) => {
           userId,
           anonName: anonName || "Anonymous",
           message: cleanMessage,
-          replyTo: replyTo || null
+          replyTo: replyTo || null,
+          isWhisper: isWhisper || false,
+          mentionedName: mentionedName || null,
+          quoteAnonName: quoteAnonName || null,
+          quoteText: quoteText || null
         });
         
         // Populate replyTo if needed, or just send raw for now
@@ -87,7 +106,18 @@ const setupSocket = (io) => {
       if (socket.user && socket.user.id) {
           userCooldowns.delete(socket.user.id);
       }
+      
+      // Cleanup active track and sync instantly
+      if (activeSockets.has(socket.id)) {
+          activeSockets.delete(socket.id);
+          io.to("waiting-room").emit("sync_active_users", Array.from(new Set(activeSockets.values())));
+      }
+      
       console.log(`User disconnected: ${socket.user?.id}`);
+      
+      // Update global online count and broadcast
+      global.onlineCount = io.engine.clientsCount;
+      io.emit("online_count", global.onlineCount);
     });
   });
 };

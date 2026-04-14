@@ -33,11 +33,15 @@ const Navbar = () => {
   const navLinks = isAdminRoute 
     ? [{ name: "Dashboard", path: "/admin/dashboard" }]
     : isAuthenticated
-      ? [
-          { name: "Home", path: "/home" },
-          { name: "Waiting Room", path: "/waiting-room" },
-          { name: "Results", path: "/results" },
-        ]
+      ? import.meta.env.VITE_PRELAUNCH_MODE === "true"
+        ? [
+            { name: "Hangout", path: "/hangout" },
+          ]
+        : [
+            { name: "Home", path: "/home" },
+            { name: "Waiting Room", path: "/waiting-room" },
+            { name: "Results", path: "/results" },
+          ]
       : []; // No links for public users (Landing Page)
 
   return (

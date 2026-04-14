@@ -23,6 +23,22 @@ const chatMessageSchema = new mongoose.Schema(
       ref: "ChatMessage",
       default: null,
     },
+    isWhisper: {
+      type: Boolean,
+      default: false,
+    },
+    mentionedName: {
+      type: String,
+      default: null,
+    },
+    quoteAnonName: {
+      type: String,
+      default: null,
+    },
+    quoteText: {
+      type: String,
+      default: null,
+    },
     isDeleted: {
       type: Boolean,
       default: false,
