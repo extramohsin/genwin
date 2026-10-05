@@ -9,15 +9,49 @@ const NeonLoveTester = () => {
     const [name1, setName1] = useState("");
     const [name2, setName2] = useState("");
     const [score, setScore] = useState(null);
+    const [isEasterEgg, setIsEasterEgg] = useState(false);
+    const [isLoveEgg, setIsLoveEgg] = useState(false);
     const [scanning, setScanning] = useState(false);
 
     const calculateLove = () => {
         if (!name1 || !name2) return;
         setScanning(true);
         setScore(null);
+        setIsEasterEgg(false);
+        setIsLoveEgg(false);
+
+        // 🥚 Easter egg: mohsin + tamanna (any order) = always 0%
+        const n1 = name1.trim().toLowerCase();
+        const n2 = name2.trim().toLowerCase();
+        const easterEggPair =
+            (n1 === "mohsin" && n2 === "tamanna") ||
+            (n1 === "tamanna" && n2 === "mohsin");
+
+        // 💛 Easter egg: furqan + sana (any order) = always 100%
+        const loveEggPair =
+            (n1 === "furqan" && n2 === "sana") ||
+            (n1 === "sana" && n2 === "furqan");
+
+        if (easterEggPair) {
+            setTimeout(() => {
+                setScanning(false);
+                setScore(0);
+                setIsEasterEgg(true);
+            }, 2000);
+            return;
+        }
+
+        if (loveEggPair) {
+            setTimeout(() => {
+                setScanning(false);
+                setScore(100);
+                setIsLoveEgg(true);
+            }, 2000);
+            return;
+        }
 
         // Deterministic but random-feeling score based on string codes
-        const combined = name1.toLowerCase() + name2.toLowerCase();
+        const combined = n1 + n2;
         let hash = 0;
         for (let i = 0; i < combined.length; i++) {
             hash = combined.charCodeAt(i) + ((hash << 5) - hash);
@@ -76,11 +110,19 @@ const NeonLoveTester = () => {
                             animate={{ scale: 1, opacity: 1 }}
                             className="text-center"
                         >
-                            <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-t from-pink-500 to-white drop-shadow-[0_0_10px_rgba(236,72,153,0.8)]">
+                            <span className={`text-5xl font-black text-transparent bg-clip-text ${
+                                isEasterEgg
+                                    ? "bg-gradient-to-t from-red-600 to-orange-400 drop-shadow-[0_0_10px_rgba(220,38,38,0.8)]"
+                                    : isLoveEgg
+                                    ? "bg-gradient-to-t from-yellow-400 to-white drop-shadow-[0_0_15px_rgba(250,204,21,0.9)]"
+                                    : "bg-gradient-to-t from-pink-500 to-white drop-shadow-[0_0_10px_rgba(236,72,153,0.8)]"
+                            }`}>
                                 {score}%
                             </span>
-                            <p className="text-xs text-gray-300 mt-2 font-mono uppercase">
-                                {score > 80 ? "MATCH MADE IN HEAVEN" : score > 50 ? "FRIENDZONE RISK" : "RUN AWAY"}
+                            <p className={`text-xs mt-2 font-mono uppercase ${
+                                isEasterEgg ? "text-red-400 animate-pulse" : isLoveEgg ? "text-yellow-400 animate-pulse" : "text-gray-300"
+                            }`}>
+                                {isEasterEgg ? "🚫 EWW, GO AWAY GUYS" : isLoveEgg ? "💛 ABSOLUTELY MADE FOR EACH OTHER" : score > 80 ? "MATCH MADE IN HEAVEN" : score > 50 ? "FRIENDZONE RISK" : "RUN AWAY"}
                             </p>
                         </motion.div>
                     ) : (

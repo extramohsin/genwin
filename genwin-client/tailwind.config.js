@@ -9,20 +9,30 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Stitch Design Palette
+        primary: "#ff87ba",
+        secondary: "#c180ff",
+        tertiary: "#7de9ff",
+        surface: "#0b0e18",
+        "surface-container": "#161925",
+        "surface-container-high": "#1b1f2c",
+        "surface-container-low": "#10131e",
+        "surface-container-highest": "#212534",
+        "surface-variant": "#212534",
+        error: "#ff6e84",
         // Deep Dark Backgrounds
         dark: {
-          950: "#020617", // Main background (Deep Navy/Black)
-          900: "#0f172a", // Secondary
-          800: "#1e293b", // Card background
+          950: "#020617",
+          900: "#0f172a",
+          800: "#1e293b",
         },
-        // Neon Accents (Glow Theme)
+        // Neon Accents
         neon: {
-          pink: "#ec4899", // Prominent Pink
-          purple: "#8b5cf6", // Deep Purple
-          blue: "#3b82f6", // Electric Blue
-          yellow: "#f59e0b", // Golden/Warn
+          pink: "#ec4899",
+          purple: "#8b5cf6",
+          blue: "#3b82f6",
+          yellow: "#f59e0b",
         },
-        // Glassmorphism Utilities
         glass: {
           border: "rgba(255, 255, 255, 0.1)",
           surface: "rgba(255, 255, 255, 0.05)",
@@ -30,6 +40,8 @@ export default {
         }
       },
       fontFamily: {
+        headline: ["Plus Jakarta Sans", "sans-serif"],
+        body: ["Inter", "sans-serif"],
         fredoka: ['"Fredoka"', "sans-serif"],
         outfit: ['"Outfit"', "sans-serif"],
         inter: ['"Inter"', "sans-serif"],
