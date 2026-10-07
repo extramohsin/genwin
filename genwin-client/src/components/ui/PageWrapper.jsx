@@ -27,7 +27,7 @@ const PageWrapper = ({ children, className = "", showNav = true, showFooter = tr
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className={`relative z-10 flex-grow container mx-auto px-4 py-24 ${className}`}
+        className={`relative z-10 flex-grow container mx-auto px-4 py-14 sm:py-20 md:py-24 ${className}`}
       >
         {children}
       </motion.main>

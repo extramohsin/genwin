@@ -47,16 +47,16 @@ const MembersTicker = ({ count, members }) => {
   const doubled = [...items, ...items];
 
   return (
-    <div className="w-full overflow-hidden bg-black/30 border-b border-white/5 py-2 px-4 flex items-center gap-4">
-      <span className="flex-shrink-0 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-neon-pink">
-        <span className="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_6px_#4ade80] animate-pulse" />
+    <div className="w-full overflow-hidden bg-black/40 border-b border-white/5 py-1.5 sm:py-2 px-3 sm:px-4 flex items-center gap-3 sm:gap-4 backdrop-blur-md">
+      <span className="flex-shrink-0 flex items-center gap-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-neon-pink">
+        <span className="w-1.5 h-1.5 rounded-full bg-green-400 shadow-[0_0_6px_#4ade80] animate-pulse" />
         {count} live
       </span>
       <div className="flex-1 overflow-hidden relative">
-        <div className="flex gap-6 animate-marquee whitespace-nowrap">
+        <div className="flex gap-5 sm:gap-6 animate-marquee whitespace-nowrap will-change-transform">
           {doubled.map((name, i) => (
-            <span key={i} className="text-[11px] text-slate-400 font-mono flex-shrink-0">
-              <span className="text-neon-purple mr-1">@</span>{name}
+            <span key={i} className="text-[10px] sm:text-[11px] text-slate-400 font-mono flex-shrink-0">
+              <span className="text-neon-purple mr-0.5">@</span>{name}
             </span>
           ))}
         </div>
@@ -68,12 +68,12 @@ const MembersTicker = ({ count, members }) => {
 // ─── Timer Box ─────────────────────────────────────────────────────────────
 const TimerBox = ({ value, label }) => (
   <div className="flex flex-col items-center">
-    <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-black/40 rounded-xl sm:rounded-2xl flex items-center justify-center border border-white/10 shadow-lg mb-1 backdrop-blur-md">
-      <span className="text-xl sm:text-2xl md:text-3xl font-black font-mono text-white">
+    <div className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-black/40 rounded-xl sm:rounded-2xl flex items-center justify-center border border-white/10 shadow-lg mb-1 backdrop-blur-md">
+      <span className="text-lg sm:text-2xl md:text-3xl font-black font-mono text-white">
         {String(value).padStart(2, "0")}
       </span>
     </div>
-    <span className="text-[8px] sm:text-[9px] text-gray-500 uppercase tracking-widest">{label}</span>
+    <span className="text-[7px] sm:text-[9px] text-gray-500 uppercase tracking-widest">{label}</span>
   </div>
 );
 
@@ -257,7 +257,7 @@ const WaitingRoom = () => {
   const totalWyr = wyrVotes.a + wyrVotes.b || 1;
 
   return (
-    <PageWrapper className="relative bg-dark-950 min-h-screen overflow-x-hidden selection:bg-neon-pink/20">
+    <PageWrapper showNav={false} showFooter={false} className="!p-0 !py-0 !px-0 !max-w-none w-full relative bg-dark-950 min-h-screen overflow-x-hidden selection:bg-neon-pink/20">
       {/* ── Ambient blobs ── */}
       <div className="fixed inset-0 overflow-hidden -z-10 pointer-events-none">
         <div className="absolute top-[-15%] left-[-10%] w-[45%] h-[45%] bg-neon-purple/10 rounded-full blur-[130px]" />
@@ -267,24 +267,22 @@ const WaitingRoom = () => {
 
       {/* ── Fixed HUD Header ── */}
       <header className="fixed top-0 w-full z-50 bg-dark-950/90 backdrop-blur-xl border-b border-white/5 shadow-[0_10px_40px_-10px_rgba(139,92,246,0.15)]">
-        <div className="flex justify-between items-center px-3 sm:px-4 md:px-6 py-2.5 sm:py-3">
+        <div className="flex justify-between items-center px-3 sm:px-4 md:px-6 py-2 sm:py-2.5">
           {/* Logo + anon name */}
-          <div className="flex flex-col">
+          <Link to="/home" className="flex flex-col hover:opacity-85 transition-opacity" title="Back to Home">
             <span className="font-fredoka text-base sm:text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-neon-pink to-neon-purple leading-none">
               genwin.zone
             </span>
             <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.15em] text-gray-500">
               @{anonName.split(" ")[0]?.toLowerCase() || "..."}
             </span>
-          </div>
+          </Link>
 
-          {/* Mobile: compact timer + online count */}
-          <div className="flex md:hidden items-center gap-2">
+          {/* Mobile: compact timer + online count + home */}
+          <div className="flex md:hidden items-center gap-1.5 sm:gap-2">
             {status.isLocked ? (
-              <span className="text-[11px] font-mono font-bold text-neon-pink bg-black/30 px-2.5 py-1 rounded-full border border-white/5">
-                {String(timeLeft.days).padStart(2, "0")}d{" "}
-                {String(timeLeft.hours).padStart(2, "0")}h{" "}
-                {String(timeLeft.minutes).padStart(2, "0")}m
+              <span className="text-[10px] sm:text-[11px] font-mono font-bold text-neon-pink bg-black/40 px-2 py-0.5 rounded-full border border-white/5 whitespace-nowrap">
+                {String(timeLeft.days).padStart(2, "0")}d {String(timeLeft.hours).padStart(2, "0")}h {String(timeLeft.minutes).padStart(2, "0")}m
               </span>
             ) : (
               <Link to="/results">
@@ -293,10 +291,13 @@ const WaitingRoom = () => {
                 </span>
               </Link>
             )}
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
+            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/5 border border-white/10">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
               <span className="text-[10px] text-gray-400 font-bold">{onlineCount}</span>
             </div>
+            <Link to="/home" title="Go to Home" className="w-7 h-7 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-gray-400 hover:text-white transition-colors">
+              <span className="text-xs">🏠</span>
+            </Link>
           </div>
 
           {/* Desktop: full countdown pill */}
@@ -320,8 +321,8 @@ const WaitingRoom = () => {
             </div>
           </div>
 
-          {/* Desktop right: lock status */}
-          <div className="hidden md:flex items-center gap-2">
+          {/* Desktop right: lock status & home link */}
+          <div className="hidden md:flex items-center gap-3">
             {status.isLocked ? (
               <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs text-gray-400">
                 <Lock size={12} /> Locked
@@ -333,6 +334,9 @@ const WaitingRoom = () => {
                 </span>
               </Link>
             )}
+            <Link to="/home" className="text-xs text-gray-400 hover:text-white px-3 py-1.5 rounded-full bg-white/5 border border-white/10 transition-colors">
+              Home 🏠
+            </Link>
           </div>
         </div>
 
@@ -361,8 +365,7 @@ const WaitingRoom = () => {
       </aside>
 
       {/* ── Main Content ── */}
-      {/* pt: accounts for fixed header (~88px mobile, ~96px desktop) + ticker + safe gap */}
-      <main className="pt-[100px] sm:pt-[108px] md:pt-28 pb-32 md:pb-20 px-3 sm:px-4 md:px-8 md:pl-20 max-w-7xl mx-auto">
+      <main className="pt-[82px] sm:pt-[90px] md:pt-[100px] pb-28 md:pb-16 px-3 sm:px-4 md:px-8 md:pl-20 max-w-7xl mx-auto w-full">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeZone}
@@ -535,24 +538,24 @@ const WaitingRoom = () => {
                   </div>
                 </div>
 
-                {/* Active users pill strip */}
+                {/* Active users pill strip — horizontal swipeable on mobile */}
                 {whoIsHere.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                    {whoIsHere.slice(0, 8).map((name, i) => (
-                      <span key={i} className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-full bg-white/5 border border-white/10 text-[10px] sm:text-[11px] text-gray-400 font-mono">
+                  <div className="flex overflow-x-auto no-scrollbar gap-1.5 sm:gap-2 py-1 -mx-1 px-1">
+                    {whoIsHere.slice(0, 15).map((name, i) => (
+                      <span key={i} className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-white/5 border border-white/10 text-[10px] sm:text-[11px] text-gray-400 font-mono flex-shrink-0">
                         @{name}
                       </span>
                     ))}
-                    {whoIsHere.length > 8 && (
-                      <span className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-full bg-white/5 border border-white/10 text-[10px] sm:text-[11px] text-gray-500">
-                        +{whoIsHere.length - 8} more
+                    {whoIsHere.length > 15 && (
+                      <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-white/5 border border-white/10 text-[10px] sm:text-[11px] text-gray-500 flex-shrink-0">
+                        +{whoIsHere.length - 15} more
                       </span>
                     )}
                   </div>
                 )}
 
                 {/* Chat window — responsive height */}
-                <div className="w-full bg-black/20 backdrop-blur-xl rounded-2xl sm:rounded-3xl flex flex-col border border-white/10 shadow-2xl overflow-hidden" style={{ height: 'min(600px, calc(100svh - 260px))' }}>
+                <div className="w-full bg-black/20 backdrop-blur-xl rounded-2xl sm:rounded-3xl flex flex-col border border-white/10 shadow-2xl overflow-hidden" style={{ height: 'min(620px, calc(100dvh - 220px))', minHeight: '340px' }}>
                   {/* Mac-style header */}
                   <div className="px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center bg-white/[0.02] border-b border-white/5">
                     <div className="flex gap-2">
@@ -602,14 +605,14 @@ const WaitingRoom = () => {
                           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-neon-pink/20 to-neon-purple/20 flex-shrink-0 border border-white/10 flex items-center justify-center text-[11px] font-black text-gray-400 uppercase">
                             {m.anonName?.[0] || "?"}
                           </div>
-                          <div className={`space-y-1 max-w-[72%] ${isMe ? "items-end" : "items-start"} flex flex-col`}>
+                          <div className={`space-y-1 max-w-[85%] sm:max-w-[72%] ${isMe ? "items-end" : "items-start"} flex flex-col`}>
                             {m.quoteText && (
                               <div className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-xl rounded-bl-none text-[10px] text-gray-500 italic max-w-full">
                                 ↩ @{m.quoteAnonName}: "{m.quoteText?.slice(0, 50)}..."
                               </div>
                             )}
                             <div
-                              className={`px-4 py-2.5 text-sm rounded-2xl cursor-pointer ${
+                              className={`px-3.5 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm rounded-2xl cursor-pointer ${
                                 isWhisper
                                   ? "bg-gradient-to-br from-neon-pink/30 to-neon-purple/30 border border-neon-pink/30"
                                   : isMe
@@ -632,12 +635,12 @@ const WaitingRoom = () => {
                   </div>
 
                   {/* Input */}
-                  <div className="p-3 sm:p-4 border-t border-white/5 bg-black/20">
-                    <form onSubmit={handleSend} className="flex items-center gap-2 sm:gap-3 bg-white/5 rounded-xl sm:rounded-2xl border border-white/10 focus-within:border-neon-pink/30 transition-all px-3 sm:px-4 py-2">
+                  <div className="p-2.5 sm:p-4 border-t border-white/5 bg-black/20">
+                    <form onSubmit={handleSend} className="flex items-center gap-2 sm:gap-3 bg-white/5 rounded-xl sm:rounded-2xl border border-white/10 focus-within:border-neon-pink/30 transition-all px-3 sm:px-4 py-1.5 sm:py-2">
                       <input
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
-                        className="flex-1 bg-transparent border-none focus:ring-0 text-sm text-gray-300 placeholder:text-gray-600"
+                        className="flex-1 bg-transparent border-none focus:ring-0 text-base sm:text-sm text-gray-300 placeholder:text-gray-600 outline-none"
                         placeholder={cooldown > 0 ? `Cooldown ${cooldown}s...` : "Send a message or @whisper someone..."}
                         disabled={cooldown > 0}
                       />
@@ -765,19 +768,19 @@ const WaitingRoom = () => {
       </main>
 
       {/* ── Mobile Bottom Nav ── */}
-      <nav className="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center pb-safe-bottom pb-6 pt-3 px-2 bg-dark-950/95 backdrop-blur-2xl z-50 rounded-t-2xl border-t border-white/5 shadow-[0_-10px_30px_rgba(0,0,0,0.6)]">
+      <nav className="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 px-2 bg-dark-950/95 backdrop-blur-2xl z-50 rounded-t-2xl border-t border-white/10 shadow-[0_-10px_30px_rgba(0,0,0,0.8)]">
         {zones.map((z) => (
           <button
             key={z.id}
             onClick={() => setActiveZone(z.id)}
-            className={`flex flex-col items-center gap-1 min-w-[64px] px-3 py-2 rounded-2xl transition-all active:scale-95 ${
+            className={`flex flex-col items-center gap-0.5 min-w-[64px] py-1.5 px-2 rounded-xl transition-all active:scale-95 ${
               activeZone === z.id
-                ? "bg-neon-pink/15 text-neon-pink shadow-[0_0_12px_rgba(236,72,153,0.2)]"
-                : "text-gray-600"
+                ? "bg-neon-pink/15 text-neon-pink border border-neon-pink/25 shadow-[0_0_12px_rgba(236,72,153,0.25)]"
+                : "text-gray-500 hover:text-gray-300"
             }`}
           >
             {z.icon}
-            <span className="text-[9px] uppercase tracking-widest font-bold">{z.label}</span>
+            <span className="text-[9px] uppercase tracking-wider font-bold">{z.label}</span>
           </button>
         ))}
       </nav>
