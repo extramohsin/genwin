@@ -32,6 +32,7 @@ export default {
           purple: "#8b5cf6",
           blue: "#3b82f6",
           yellow: "#f59e0b",
+          cyan: "#22d3ee",
         },
         glass: {
           border: "rgba(255, 255, 255, 0.1)",
@@ -53,6 +54,7 @@ export default {
         "blob": "blob 7s infinite",
         "fade-in-up": "fadeInUp 0.6s ease-out forwards",
         "glow": "glow 2s ease-in-out infinite alternate",
+        "marquee": "marquee 25s linear infinite",
       },
       keyframes: {
         float: {
@@ -72,7 +74,11 @@ export default {
         glow: {
           "0%": { boxShadow: "0 0 5px rgba(236, 72, 153, 0.2)" },
           "100%": { boxShadow: "0 0 20px rgba(236, 72, 153, 0.6), 0 0 10px rgba(236, 72, 153, 0.4)" },
-        }
+        },
+        marquee: {
+          "0%": { transform: "translateX(0%)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
       },
     },
   },
